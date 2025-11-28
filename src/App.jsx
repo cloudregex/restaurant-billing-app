@@ -20,7 +20,6 @@ import TableIndex from './pages/table/TableIndex';
 import BillingIndex from './pages/billing/BillingIndex';
 import TableSelect from './pages/billing/TableSelect';
 import BillingCreate from './pages/billing/BillingCreate';
-import FinalBill from './pages/billing/FinalBill';
 
 const Layout = () => {
   const location = useLocation();
@@ -46,7 +45,6 @@ const Layout = () => {
           <Route path="/billing" element={<BillingIndex />} />
           <Route path="/billing/table-select" element={<TableSelect />} />
           <Route path="/billing/create/:tableNumber" element={<BillingCreate />} />
-          <Route path="/billing/final/:tableNumber" element={<FinalBill />} />
         </Routes>
       </div>
     </div>
