@@ -7,8 +7,27 @@ const Pagination = ({
     totalItems,
     itemsPerPage,
     onPageChange,
+    loading = false,
     className = ''
 }) => {
+    // Skeleton loading state
+    if (loading) {
+        return (
+            <div className={`flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 ${className}`}>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse"></div>
+                <div className="flex space-x-2">
+                    <div className="h-10 w-20 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+                    <div className="flex space-x-1">
+                        <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+                        <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+                        <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+                    </div>
+                    <div className="h-10 w-20 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+                </div>
+            </div>
+        );
+    }
+
     // Don't show pagination if there's only one page
     if (totalPages <= 1) {
         return null;

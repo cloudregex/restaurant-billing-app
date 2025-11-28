@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import UniversalInput from '../../components/UniversalInput';
+import UniversalTextarea from '../../components/UniversalTextarea';
+import UniversalButton from '../../components/UniversalButton';
 
 const SupplierCreateModal = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState({
@@ -29,8 +32,16 @@ const SupplierCreateModal = ({ isOpen, onClose }) => {
         e.preventDefault();
         if (validate()) {
             console.log('Creating Supplier:', formData);
-            // Here you would typically call an API to create the supplier
             onClose();
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        const newValue = name === 'mobile' ? value.replace(/\D/g, '').slice(0, 10) : value;
+        setFormData(prev => ({ ...prev, [name]: newValue }));
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: '' }));
         }
     };
 
@@ -47,74 +58,67 @@ const SupplierCreateModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Supplier Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className={`w-full px-4 py-2 rounded-lg border ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all`}
-                            placeholder="Enter supplier name"
-                        />
-                        {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
-                    </div>
+                    <UniversalInput
+                        label="Supplier Name"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        error={errors.name}
+                        placeholder="Enter supplier name"
+                        required
+                    />
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Mobile Number <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.mobile}
-                            onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                            className={`w-full px-4 py-2 rounded-lg border ${errors.mobile ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all`}
-                            placeholder="Enter 10-digit mobile number"
-                        />
-                        {errors.mobile && <p className="text-xs text-red-500 mt-1">{errors.mobile}</p>}
-                    </div>
+                    <UniversalInput
+                        label="Mobile Number"
+                        id="mobile"
+                        name="mobile"
+                        type="tel"
+                        value={formData.mobile}
+                        onChange={handleChange}
+                        error={errors.mobile}
+                        placeholder="Enter 10-digit mobile number"
+                        required
+                    />
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Address
-                        </label>
-                        <textarea
-                            value={formData.address}
-                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
-                            rows="3"
-                            placeholder="Enter supplier address (optional)"
-                        ></textarea>
-                    </div>
+                    <UniversalTextarea
+                        label="Address"
+                        id="address"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleChange}
+                        placeholder="Enter supplier address (optional)"
+                        rows={3}
+                    />
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Items / Notes
-                        </label>
-                        <textarea
-                            value={formData.items}
-                            onChange={(e) => setFormData({ ...formData, items: e.target.value })}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
-                            rows="2"
-                            placeholder="Enter items supplied or notes (optional)"
-                        ></textarea>
-                    </div>
+                    <UniversalTextarea
+                        label="Items / Notes"
+                        id="items"
+                        name="items"
+                        value={formData.items}
+                        onChange={handleChange}
+                        placeholder="Enter items supplied or notes (optional)"
+                        rows={2}
+                    />
 
                     <div className="flex gap-3 pt-4">
-                        <button
+                        <UniversalButton
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-colors"
+                            color="gray"
+                            variant="outlined"
+                            className="flex-1"
                         >
                             Cancel
-                        </button>
-                        <button
+                        </UniversalButton>
+                        <UniversalButton
                             type="submit"
-                            className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                            color="blue"
+                            variant="filled"
+                            className="flex-1"
                         >
                             Save Supplier
-                        </button>
+                        </UniversalButton>
                     </div>
                 </form>
             </div>

@@ -8,10 +8,24 @@ const UniversalCheckbox = forwardRef(({
     error,
     disabled,
     required,
+    loading = false,
     className = '',
     indeterminate = false,
     ...props
 }, ref) => {
+    if (loading) {
+        return (
+            <div className={`mb-4 ${className}`}>
+                <div className="flex items-center">
+                    <div className="h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    {label && (
+                        <div className="ml-2 h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={`mb-4 ${className}`}>
             <div className="flex items-center">

@@ -8,6 +8,7 @@ const UniversalButton = ({
     icon,
     iconOnly = false,
     disabled = false,
+    loading = false,
     className = '',
     onClick,
     href,
@@ -75,7 +76,7 @@ const UniversalButton = ({
     const disabledClasses = 'opacity-50 cursor-not-allowed hover:scale-100 active:scale-100 shadow-none';
 
     // Ensure disabled is properly evaluated as a boolean
-    const isDisabled = Boolean(disabled);
+    const isDisabled = Boolean(disabled) || loading;
 
     // Determine button classes
     const buttonColorClasses = colorMap[color] && colorMap[color][variant]
@@ -109,6 +110,16 @@ const UniversalButton = ({
             onClick(e);
         }
     };
+
+    if (loading) {
+        // Skeleton state
+        const skeletonWidth = iconOnly ? 'w-10' : 'w-24';
+        const skeletonHeight = size === 'sm' ? 'h-8' : size === 'lg' ? 'h-12' : 'h-10';
+
+        return (
+            <div className={`${skeletonWidth} ${skeletonHeight} bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse ${className}`}></div>
+        );
+    }
 
     // Render as anchor if href is provided
     if (href) {

@@ -9,6 +9,7 @@ const UniversalMultiSelect = forwardRef(({
     error,
     disabled,
     required,
+    loading = false,
     className = '',
     placeholder = 'Select options',
     options = [],
@@ -87,6 +88,17 @@ const UniversalMultiSelect = forwardRef(({
     const isOptionSelected = (optionValue) => {
         return value.includes(optionValue);
     };
+
+    if (loading) {
+        return (
+            <div className={`relative ${className}`}>
+                {label && (
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse"></div>
+                )}
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+            </div>
+        );
+    }
 
     return (
         <div className={`relative ${className}`} ref={selectRef}>

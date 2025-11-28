@@ -9,7 +9,7 @@ import {
     Heading1, Heading2, Heading3, ImageIcon, Link2, Code
 } from 'lucide-react';
 
-const UniversalRichTextEditor = ({ value, onChange, placeholder, label }) => {
+const UniversalRichTextEditor = ({ value, onChange, placeholder, label, loading = false }) => {
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -67,6 +67,17 @@ const UniversalRichTextEditor = ({ value, onChange, placeholder, label }) => {
         editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
     }, [editor]);
 
+    if (loading) {
+        return (
+            <div className="w-full">
+                {label && (
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse"></div>
+                )}
+                <div className="h-40 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+            </div>
+        );
+    }
+
     if (!editor) {
         return null;
     }
@@ -78,8 +89,8 @@ const UniversalRichTextEditor = ({ value, onChange, placeholder, label }) => {
                 onClick();
             }}
             className={`p-2 rounded transition-colors ${active
-                    ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
             title={title}
             type="button"

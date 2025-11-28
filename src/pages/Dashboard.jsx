@@ -13,7 +13,6 @@ import {
     Legend
 } from 'recharts';
 import SkeletonCard from '../components/SkeletonCard';
-import SkeletonTable from '../components/SkeletonTable';
 import SkeletonChart from '../components/SkeletonChart';
 
 const Dashboard = () => {
@@ -223,7 +222,7 @@ const Dashboard = () => {
 
             {/* Recent Orders Table */}
             {loading ? (
-                <SkeletonTable rows={5} columns={6} />
+                <></>
             ) : (
                 <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
                     <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">

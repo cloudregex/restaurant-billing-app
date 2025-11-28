@@ -10,6 +10,7 @@ const UniversalFileUpload = forwardRef(({
     error,
     disabled,
     required,
+    loading = false,
     className = '',
     placeholder = 'Choose a file',
     accept = '*',
@@ -133,6 +134,17 @@ const UniversalFileUpload = forwardRef(({
     // Separate image and non-image files for display
     const imageFiles = files.filter(item => item.isImage);
     const nonImageFiles = files.filter(item => !item.isImage);
+
+    if (loading) {
+        return (
+            <div className={`mb-4 relative ${className}`}>
+                {label && (
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse"></div>
+                )}
+                <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+            </div>
+        );
+    }
 
     return (
         <div className={`mb-4 relative ${className}`}>

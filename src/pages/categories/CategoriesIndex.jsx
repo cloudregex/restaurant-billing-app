@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import CategorieCreateModal from './CategorieCreateModal';
 import CategorieEditModal from './CategorieEditModal';
 import SkeletonCard from '../../components/SkeletonCard';
-import SkeletonTable from '../../components/SkeletonTable';
+import Table from '../../components/Table';
+import UniversalButton from '../../components/UniversalButton';
 
 const CategoriesIndex = () => {
     const [loading, setLoading] = useState(true);
@@ -142,68 +143,64 @@ const CategoriesIndex = () => {
             </div>
 
             {/* Table */}
-            {loading ? (
-                <SkeletonTable rows={5} columns={4} />
-            ) : (
-                <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                                    <th className="p-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Category Name</th>
-                                    <th className="p-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Description</th>
-                                    <th className="p-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                                    <th className="p-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                {filteredCategories.length > 0 ? (
-                                    filteredCategories.map((category) => (
-                                        <tr key={category.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                            <td className="p-4 text-sm font-medium text-gray-900 dark:text-white">{category.name}</td>
-                                            <td className="p-4 text-sm text-gray-600 dark:text-gray-300">{category.description}</td>
-                                            <td className="p-4">
-                                                <span className={`px-2 py-1 text-xs font-medium rounded-full ${category.status === 'Active'
-                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                                                    }`}>
-                                                    {category.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 text-right space-x-2">
-                                                <button
-                                                    onClick={() => handleEdit(category)}
-                                                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
-                                                    title="Edit"
-                                                >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                    </svg>
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(category.id)}
-                                                    className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                                                    title="Delete"
-                                                >
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="4" className="p-8 text-center text-gray-500 dark:text-gray-400">
-                                            No categories found matching your search.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            )}
+            <Table
+                columns={[
+                    { header: 'Category Name', key: 'name' },
+                    { header: 'Description', key: 'description' },
+                    {
+                        header: 'Status',
+                        key: 'status',
+                        render: (value) => (
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${value === 'Active'
+                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                }`}>
+                                {value}
+                            </span>
+                        )
+                    }
+                ]}
+                data={filteredCategories}
+                loading={loading}
+                actions={[
+                    {
+                        label: (
+                            <UniversalButton
+                                color="blue"
+                                variant="text"
+                                size="sm"
+                                icon={
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                }
+                                iconOnly
+                            >
+                                Edit
+                            </UniversalButton>
+                        ),
+                        onClick: handleEdit
+                    },
+                    {
+                        label: (
+                            <UniversalButton
+                                color="red"
+                                variant="text"
+                                size="sm"
+                                icon={
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                }
+                                iconOnly
+                            >
+                                Delete
+                            </UniversalButton>
+                        ),
+                        onClick: (row) => handleDelete(row.id)
+                    }
+                ]}
+            />
 
             {/* Modals */}
             {isCreateModalOpen && (

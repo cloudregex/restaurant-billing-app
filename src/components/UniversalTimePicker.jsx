@@ -9,6 +9,7 @@ const UniversalTimePicker = ({
     error,
     required = false,
     disabled = false,
+    loading = false,
     className = "",
 }) => {
     const [open, setOpen] = useState(false);
@@ -69,6 +70,17 @@ const UniversalTimePicker = ({
         document.addEventListener("click", handleClickOutside, true);
         return () => document.removeEventListener("click", handleClickOutside, true);
     }, []);
+
+    if (loading) {
+        return (
+            <div className={`relative mb-4 ${className}`}>
+                {label && (
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse"></div>
+                )}
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+            </div>
+        );
+    }
 
     return (
         <div className={`relative mb-4 ${className}`} ref={pickerRef}>

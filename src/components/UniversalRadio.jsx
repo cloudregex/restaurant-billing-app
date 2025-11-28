@@ -10,11 +10,30 @@ const UniversalRadio = forwardRef(({
     error,
     disabled,
     required,
+    loading = false,
     className = '',
     options = [],
     inline = false,
     ...props
 }, ref) => {
+    if (loading) {
+        return (
+            <div className={`mb-4 ${className}`}>
+                {label && (
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse"></div>
+                )}
+                <div className={inline ? 'flex space-x-4' : 'space-y-2'}>
+                    {options.map((_, index) => (
+                        <div key={index} className={`flex items-center ${inline ? 'space-x-2' : ''}`}>
+                            <div className="h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+                            <div className="ml-2 h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse"></div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={`mb-4 ${className}`}>
             {label && (

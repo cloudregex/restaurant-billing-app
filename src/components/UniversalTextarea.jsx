@@ -8,12 +8,24 @@ const UniversalTextarea = forwardRef(({
     error,
     disabled,
     required,
+    loading = false,
     className = '',
     placeholder = '',
     rows = 4,
     maxLength,
     ...props
 }, ref) => {
+    if (loading) {
+        return (
+            <div className={`mb-4 ${className}`}>
+                {label && (
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse"></div>
+                )}
+                <div className={`bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse`} style={{ height: `${rows * 24 + 16}px` }}></div>
+            </div>
+        );
+    }
+
     return (
         <div className={`mb-4 ${className}`}>
             {label && (

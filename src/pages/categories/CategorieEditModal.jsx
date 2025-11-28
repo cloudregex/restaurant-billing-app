@@ -1,23 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import UniversalInput from '../../components/UniversalInput';
+import UniversalTextarea from '../../components/UniversalTextarea';
+import UniversalButton from '../../components/UniversalButton';
 
 const CategorieEditModal = ({ isOpen, onClose, category }) => {
     const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        status: 'Active'
+        name: category?.name || '',
+        description: category?.description || '',
+        status: category?.status || 'Active'
     });
 
     const [errors, setErrors] = useState({});
-
-    useEffect(() => {
-        if (category) {
-            setFormData({
-                name: category.name || '',
-                description: category.description || '',
-                status: category.status || 'Active'
-            });
-        }
-    }, [category]);
 
     if (!isOpen) return null;
 
@@ -31,9 +24,16 @@ const CategorieEditModal = ({ isOpen, onClose, category }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (validate()) {
-            console.log('Updating Category:', { ...category, ...formData });
-            // Here you would typically call an API to update the category
+            console.log('Updating Category:', formData);
             onClose();
+        }
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: '' }));
         }
     };
 
@@ -50,61 +50,45 @@ const CategorieEditModal = ({ isOpen, onClose, category }) => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Category Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className={`w-full px-4 py-2 rounded-lg border ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all`}
-                            placeholder="Enter category name"
-                        />
-                        {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
-                    </div>
+                    <UniversalInput
+                        label="Category Name"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        error={errors.name}
+                        placeholder="Enter category name"
+                        required
+                    />
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Description
-                        </label>
-                        <textarea
-                            value={formData.description}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
-                            rows="3"
-                            placeholder="Enter category description (optional)"
-                        ></textarea>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Status
-                        </label>
-                        <select
-                            value={formData.status}
-                            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                        >
-                            <option value="Active">Active</option>
-                            <option value="Deactive">Deactive</option>
-                        </select>
-                    </div>
+                    <UniversalTextarea
+                        label="Description"
+                        id="description"
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                        placeholder="Enter category description (optional)"
+                        rows={3}
+                    />
 
                     <div className="flex gap-3 pt-4">
-                        <button
+                        <UniversalButton
                             type="button"
                             onClick={onClose}
-                            className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-medium transition-colors"
+                            color="gray"
+                            variant="outlined"
+                            className="flex-1"
                         >
                             Cancel
-                        </button>
-                        <button
+                        </UniversalButton>
+                        <UniversalButton
                             type="submit"
-                            className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                            color="blue"
+                            variant="filled"
+                            className="flex-1"
                         >
                             Update Category
-                        </button>
+                        </UniversalButton>
                     </div>
                 </form>
             </div>
