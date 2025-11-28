@@ -20,6 +20,7 @@ import TableIndex from './pages/table/TableIndex';
 import BillingIndex from './pages/billing/BillingIndex';
 import TableSelect from './pages/billing/TableSelect';
 import BillingCreate from './pages/billing/BillingCreate';
+import EmployeeIndex from './pages/employee/EmployeeIndex';
 
 const Layout = () => {
   const location = useLocation();
@@ -45,6 +46,7 @@ const Layout = () => {
           <Route path="/billing-list" element={<BillingIndex />} />
           <Route path="/billing/table-select" element={<TableSelect />} />
           <Route path="/billing/create/:tableNumber" element={<BillingCreate />} />
+          <Route path="/employee" element={<EmployeeIndex />} />
         </Routes>
       </div>
     </div>

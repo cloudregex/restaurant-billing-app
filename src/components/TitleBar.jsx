@@ -84,15 +84,8 @@ const TitleBar = () => {
             name: 'Finance',
             submenu: [
                 { name: 'Income', path: '/income' },
-                { name: 'Expenses', path: '/expense' }
-            ]
-        },
-        {
-            name: 'Settings',
-            submenu: [
-                { name: 'Table', path: '/table' },
-                { name: 'Category', path: '/category' },
-                { name: 'Tax', path: '/tax' }
+                { name: 'Expenses', path: '/expense' },
+                { name: 'Salary', path: '/salary' }
             ]
         },
         {
@@ -101,6 +94,14 @@ const TitleBar = () => {
                 { name: 'Transactions', path: '/transactions' },
                 { name: 'Bill Reports', path: '/reports' },
                 { name: 'Purchase Reports', path: '/purchase-reports' }
+            ]
+        },
+        {
+            name: 'Settings',
+            submenu: [
+                { name: 'Table', path: '/table' },
+                { name: 'Category', path: '/category' },
+                { name: 'Tax', path: '/tax' }
             ]
         },
     ];
