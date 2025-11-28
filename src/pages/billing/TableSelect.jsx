@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HiArrowLeft } from 'react-icons/hi';
+import { HiArrowLeft, HiUserGroup, HiCurrencyRupee, HiCheckCircle, HiClock, HiBan } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import UniversalButton from '../../components/UniversalButton';
 
@@ -10,7 +10,7 @@ const TableSelect = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             setLoading(false);
-        }, 1000);
+        }, 800);
         return () => clearTimeout(timer);
     }, []);
 
@@ -23,69 +23,152 @@ const TableSelect = () => {
         { id: 6, number: 'T-06', capacity: 2, status: 'Available', currentBill: 0 },
         { id: 7, number: 'T-07', capacity: 4, status: 'Reserved', currentBill: 0 },
         { id: 8, number: 'T-08', capacity: 6, status: 'Available', currentBill: 0 },
+        { id: 9, number: 'T-09', capacity: 4, status: 'Available', currentBill: 0 },
+        { id: 10, number: 'T-10', capacity: 10, status: 'Reserved', currentBill: 0 },
     ];
 
     const handleTableSelect = (table) => {
         navigate(`/billing/create/${table.number}`);
     };
 
+    // Stats Calculation
+    const totalTables = tables.length;
+    const occupied = tables.filter(t => t.status === 'Occupied').length;
+    const available = tables.filter(t => t.status === 'Available').length;
+    const reserved = tables.filter(t => t.status === 'Reserved').length;
+
     if (loading) {
         return (
-            <div className="h-[calc(100vh-40px)] bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                <div className="text-gray-500 dark:text-gray-400">Loading tables...</div>
+            <div className="h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+                <div className="animate-pulse flex flex-col items-center">
+                    <div className="h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <div className="text-gray-500 dark:text-gray-400 font-medium">Loading Tables...</div>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="h-[calc(100vh-40px)] bg-gray-50 dark:bg-gray-900 p-6">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-slate-900 p-6 transition-colors duration-300">
             <div className="max-w-7xl mx-auto">
-                <div className="flex items-center gap-4 mb-6">
-                    <UniversalButton
-                        onClick={() => navigate('/billing')}
-                        color="gray"
-                        variant="outlined"
-                        icon={<HiArrowLeft />}
-                        iconOnly
-                    />
-                    <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Select Table</h1>
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+                    <div className="flex items-center gap-4 w-full md:w-auto">
+                        <UniversalButton
+                            onClick={() => navigate('/billing')}
+                            color="white"
+                            className="shadow-md hover:shadow-lg transition-shadow dark:bg-gray-800 dark:text-white"
+                            icon={<HiArrowLeft className="w-5 h-5" />}
+                            iconOnly
+                        />
+                        <div>
+                            <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
+                                Table Selection
+                            </h1>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your restaurant seating</p>
+                        </div>
+                    </div>
+
+                    {/* Stats Cards */}
+                    <div className="flex gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+                        <StatusBadge count={totalTables} label="Total" color="blue" icon={<HiUserGroup />} />
+                        <StatusBadge count={available} label="Available" color="green" icon={<HiCheckCircle />} />
+                        <StatusBadge count={occupied} label="Occupied" color="red" icon={<HiBan />} />
+                        <StatusBadge count={reserved} label="Reserved" color="yellow" icon={<HiClock />} />
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {tables.map(table => (
+                {/* Grid Layout */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    {tables.map((table, index) => (
                         <div
                             key={table.id}
                             onClick={() => handleTableSelect(table)}
-                            className={`bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all cursor-pointer text-center border-4 ${table.status === 'Occupied'
-                                    ? 'border-red-500 hover:border-red-600'
+                            className={`
+                                group relative overflow-hidden rounded-2xl p-5 cursor-pointer transition-all duration-300
+                                bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700
+                                hover:-translate-y-1 hover:shadow-2xl
+                                ${table.status === 'Occupied'
+                                    ? 'shadow-red-100 dark:shadow-red-900/20'
                                     : table.status === 'Reserved'
-                                        ? 'border-yellow-500 hover:border-yellow-600'
-                                        : 'border-green-500 hover:border-green-600'
-                                }`}
+                                        ? 'shadow-yellow-100 dark:shadow-yellow-900/20'
+                                        : 'shadow-green-100 dark:shadow-green-900/20'}
+                            `}
+                            style={{ animationDelay: `${index * 50}ms` }}
                         >
-                            <h3 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">{table.number}</h3>
-                            <p className="text-gray-600 dark:text-gray-400 mb-3">
-                                <span className="text-lg font-medium">{table.capacity}</span> Persons
-                            </p>
+                            {/* Status Indicator Stripe */}
+                            <div className={`absolute top-0 left-0 w-full h-1.5 
+                                ${table.status === 'Occupied' ? 'bg-gradient-to-r from-red-500 to-pink-500' :
+                                    table.status === 'Reserved' ? 'bg-gradient-to-r from-yellow-400 to-orange-500' :
+                                        'bg-gradient-to-r from-green-400 to-emerald-500'}
+                            `} />
 
-                            {table.currentBill > 0 && (
-                                <div className="mb-3 p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">Current Bill</p>
-                                    <p className="text-xl font-bold text-red-600 dark:text-red-400">₹{table.currentBill}</p>
+                            <div className="flex justify-between items-start mb-4 mt-2">
+                                <div className="bg-gray-100 dark:bg-gray-700/50 p-2.5 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                                    <span className="text-2xl font-bold text-gray-700 dark:text-gray-200">
+                                        {table.number.split('-')[1]}
+                                    </span>
                                 </div>
-                            )}
+                                <span className={`px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1
+                                    ${table.status === 'Occupied' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
+                                        table.status === 'Reserved' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                                            'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'}
+                                `}>
+                                    <span className={`w-1.5 h-1.5 rounded-full animate-pulse
+                                        ${table.status === 'Occupied' ? 'bg-red-500' :
+                                            table.status === 'Reserved' ? 'bg-yellow-500' :
+                                                'bg-green-500'}
+                                    `}></span>
+                                    {table.status}
+                                </span>
+                            </div>
 
-                            <span className={`inline-block px-4 py-2 rounded-full text-sm font-bold ${table.status === 'Available'
-                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                    : table.status === 'Reserved'
-                                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                        : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                                }`}>
-                                {table.status}
-                            </span>
+                            <div className="space-y-3">
+                                <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
+                                    <HiUserGroup className="w-4 h-4 mr-2" />
+                                    <span>Capacity: <strong className="text-gray-700 dark:text-gray-200">{table.capacity}</strong></span>
+                                </div>
+
+                                {table.currentBill > 0 ? (
+                                    <div className="bg-red-50 dark:bg-red-900/10 rounded-lg p-2.5 border border-red-100 dark:border-red-900/30">
+                                        <div className="flex items-center justify-between text-red-600 dark:text-red-400">
+                                            <span className="text-xs font-medium uppercase tracking-wider">Current Bill</span>
+                                            <HiCurrencyRupee className="w-4 h-4" />
+                                        </div>
+                                        <div className="text-lg font-bold text-red-700 dark:text-red-300 mt-0.5">
+                                            ₹{table.currentBill}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="h-[58px] flex items-center justify-center text-gray-300 dark:text-gray-600 text-sm border-2 border-dashed border-gray-100 dark:border-gray-700 rounded-lg">
+                                        No Active Bill
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
+            </div>
+        </div>
+    );
+};
+
+const StatusBadge = ({ count, label, color, icon }) => {
+    const colorClasses = {
+        blue: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+        green: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+        red: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+        yellow: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400',
+    };
+
+    return (
+        <div className="flex items-center gap-3 bg-white dark:bg-gray-800 px-4 py-2 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 min-w-[140px]">
+            <div className={`p-2 rounded-lg ${colorClasses[color]}`}>
+                {React.cloneElement(icon, { className: "w-5 h-5" })}
+            </div>
+            <div>
+                <div className="text-xl font-bold text-gray-800 dark:text-white leading-none">{count}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">{label}</div>
             </div>
         </div>
     );
