@@ -10,6 +10,7 @@ import showToast from '../../utils/toast';
 const BillingCreate = () => {
     const navigate = useNavigate();
     const { tableNumber } = useParams();
+    const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [billItems, setBillItems] = useState([]);
     const [selectedCustomerId, setSelectedCustomerId] = useState('walk-in');
@@ -27,6 +28,14 @@ const BillingCreate = () => {
     ];
 
     const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
+
+    // Simulate loading
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 800);
+        return () => clearTimeout(timer);
+    }, []);
 
     const categories = ['All', 'Starters', 'Main Course', 'Desserts', 'Beverages'];
 
@@ -107,6 +116,91 @@ const BillingCreate = () => {
         showToast.success('Bill completed successfully!');
         navigate('/billing/table-select');
     };
+
+    if (loading) {
+        return (
+            <div className="h-[calc(100vh-40px)] bg-gray-50 dark:bg-gray-900 flex overflow-hidden">
+                {/* Left: Categories Skeleton */}
+                <div className="w-48 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                        <div className="h-9 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse mb-2"></div>
+                        <div className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse">
+                            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse"></div>
+                            <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded animate-pulse"></div>
+                        </div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-2">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <div key={i} className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2 animate-pulse"></div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Middle: Products Skeleton */}
+                <div className="flex-1 overflow-y-auto p-6">
+                    <div className="mb-4">
+                        <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
+                        <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                            <div key={i} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg">
+                                <div className="h-32 bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
+                                <div className="p-3">
+                                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
+                                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
+                                    <div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Right: Bill Skeleton */}
+                <div className="w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                        <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1"></div>
+                        <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
+
+                        <div className="space-y-3">
+                            <div className="flex gap-2">
+                                <div className="flex-1 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+                                <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-4">
+                        <div className="text-center mt-8">
+                            <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-2 animate-pulse"></div>
+                            <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded mx-auto mb-2 animate-pulse"></div>
+                            <div className="h-3 w-40 bg-gray-200 dark:bg-gray-700 rounded mx-auto animate-pulse"></div>
+                        </div>
+                    </div>
+
+                    <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+                        <div className="flex justify-between">
+                            <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                            <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                        </div>
+                        <div className="flex justify-between">
+                            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                            <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                        </div>
+                        <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-3">
+                            <div className="h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                            <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                        </div>
+
+                        <div className="flex gap-2 pt-2">
+                            <div className="flex-1 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+                            <div className="flex-1 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="h-[calc(100vh-40px)] bg-gray-50 dark:bg-gray-900 flex overflow-hidden">
