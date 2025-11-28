@@ -112,12 +112,15 @@ const UniversalButton = ({
     };
 
     if (loading) {
-        // Skeleton state
-        const skeletonWidth = iconOnly ? 'w-10' : 'w-24';
-        const skeletonHeight = size === 'sm' ? 'h-8' : size === 'lg' ? 'h-12' : 'h-10';
-
+        // Skeleton state - use invisible content to maintain size
         return (
-            <div className={`${skeletonWidth} ${skeletonHeight} bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse ${className}`}></div>
+            <div className={`inline-flex items-center justify-center ${sizeClasses[size]} bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse select-none pointer-events-none ${className}`}>
+                <div className="opacity-0 flex items-center">
+                    {icon && !iconOnly && <span className="mr-2">{icon}</span>}
+                    {!iconOnly && children}
+                    {icon && iconOnly && icon}
+                </div>
+            </div>
         );
     }
 

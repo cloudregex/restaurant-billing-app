@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HiUsers, HiCheckCircle, HiXCircle, HiPencil, HiTrash, HiSearch, HiPlus } from 'react-icons/hi';
 import { SwalConfig } from '../../components/SwalConfig';
+import showToast from '../../utils/toast';
 import SupplierCreateModal from './SupplierCreateModal';
 import SupplierEditModal from './SupplierEditModal';
 import StatsCard from '../../components/StatsCard';
@@ -60,7 +61,7 @@ const SupplierIndex = () => {
 
         if (result.isConfirmed) {
             setSuppliers(suppliers.filter(s => s.id !== id));
-            SwalConfig.success('Deleted!', 'Supplier has been deleted successfully.');
+            showToast.success('Supplier has been deleted successfully.');
         }
     };
 
@@ -159,17 +160,19 @@ const SupplierIndex = () => {
             {/* Actions & Filters */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
                 <div className="flex gap-4 w-full md:w-auto items-end">
-                    <div className="relative w-full md:w-64">
+                    <div className="w-full md:w-64">
                         <UniversalInput
                             type="text"
                             placeholder="Search Name or Mobile..."
                             value={searchTerm}
+                            loading={loading}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="mb-0"
+                            leftIcon={<HiSearch className="w-5 h-5" />}
                         />
-                        <HiSearch className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
                     </div>
                     <UniversalSelect
+                        loading={loading}
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
                         options={[
@@ -183,6 +186,7 @@ const SupplierIndex = () => {
                 <UniversalButton
                     onClick={() => setIsCreateModalOpen(true)}
                     color="blue"
+                    loading={loading}
                     icon={<HiPlus />}
                     className="w-full md:w-auto"
                 >

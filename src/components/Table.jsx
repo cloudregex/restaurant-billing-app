@@ -37,18 +37,18 @@ const Table = ({ columns, data, actions, onRowClick, loading }) => {
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-900/80">
               <tr>
-                {columns.map((column, index) => (
+                {columns.map((_, index) => (
                   <th
                     key={index}
                     scope="col"
                     className="px-6 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider"
                   >
-                    {column.header}
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
                   </th>
                 ))}
                 {actions && (
                   <th scope="col" className="px-6 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider">
-                    Actions
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 ml-auto animate-pulse"></div>
                   </th>
                 )}
               </tr>
