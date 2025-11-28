@@ -13,6 +13,14 @@ import ResetPassword from './pages/auth/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import SupplierIndex from './pages/supplier/SupplierIndex';
 import CategoriesIndex from './pages/categories/CategoriesIndex';
+import CustomerIndex from './pages/customer/CustomerIndex';
+import TaxIndex from './pages/tax/TaxIndex';
+import MenuIndex from './pages/menu/MenuIndex';
+import TableIndex from './pages/table/TableIndex';
+import BillingIndex from './pages/billing/BillingIndex';
+import TableSelect from './pages/billing/TableSelect';
+import BillingCreate from './pages/billing/BillingCreate';
+import FinalBill from './pages/billing/FinalBill';
 
 const Layout = () => {
   const location = useLocation();
@@ -31,6 +39,14 @@ const Layout = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/supplier" element={<SupplierIndex />} />
           <Route path="/category" element={<CategoriesIndex />} />
+          <Route path="/customer" element={<CustomerIndex />} />
+          <Route path="/tax" element={<TaxIndex />} />
+          <Route path="/menu" element={<MenuIndex />} />
+          <Route path="/table" element={<TableIndex />} />
+          <Route path="/billing" element={<BillingIndex />} />
+          <Route path="/billing/table-select" element={<TableSelect />} />
+          <Route path="/billing/create/:tableNumber" element={<BillingCreate />} />
+          <Route path="/billing/final/:tableNumber" element={<FinalBill />} />
         </Routes>
       </div>
     </div>

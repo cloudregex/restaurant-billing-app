@@ -154,50 +154,51 @@ const SupplierIndex = () => {
             </div>
 
             {/* Actions & Filters */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-                <div className="flex gap-4 w-full md:w-auto items-end">
-                    <div className="w-full md:w-64">
-                        <UniversalInput
-                            type="text"
-                            placeholder="Search Name or Mobile..."
-                            value={searchTerm}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                    <div className="flex gap-4 w-full md:w-auto items-end">
+                        <div className="w-full md:w-64">
+                            <UniversalInput
+                                type="text"
+                                placeholder="Search Name or Mobile..."
+                                value={searchTerm}
+                                loading={loading}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="mb-0"
+                                leftIcon={<HiSearch className="w-5 h-5" />}
+                            />
+                        </div>
+                        <UniversalSelect
                             loading={loading}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="mb-0"
-                            leftIcon={<HiSearch className="w-5 h-5" />}
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            options={[
+                                { value: 'All', label: 'All Status' },
+                                { value: 'Active', label: 'Active' },
+                                { value: 'Deactive', label: 'Deactive' }
+                            ]}
+                            className="mb-0 w-full md:w-auto min-w-[150px]"
                         />
                     </div>
-                    <UniversalSelect
+                    <UniversalButton
+                        onClick={() => setIsCreateModalOpen(true)}
+                        color="blue"
                         loading={loading}
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        options={[
-                            { value: 'All', label: 'All Status' },
-                            { value: 'Active', label: 'Active' },
-                            { value: 'Deactive', label: 'Deactive' }
-                        ]}
-                        className="mb-0 w-full md:w-auto min-w-[150px]"
-                    />
+                        icon={<HiPlus />}
+                        className="w-full md:w-auto"
+                    >
+                        Add Supplier
+                    </UniversalButton>
                 </div>
-                <UniversalButton
-                    onClick={() => setIsCreateModalOpen(true)}
-                    color="blue"
+
+                {/* Table */}
+                <Table
+                    columns={columns}
+                    data={filteredSuppliers}
                     loading={loading}
-                    icon={<HiPlus />}
-                    className="w-full md:w-auto"
-                >
-                    Add Supplier
-                </UniversalButton>
+                    actions={action}
+                />
             </div>
-
-            {/* Table */}
-            <Table
-                columns={columns}
-                data={filteredSuppliers}
-                loading={loading}
-                actions={action}
-            />
-
             {/* Modals */}
             {isCreateModalOpen && (
                 <SupplierCreateModal

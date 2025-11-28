@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { HiCollection, HiCheckCircle, HiXCircle, HiPencil, HiTrash, HiSearch, HiPlus } from 'react-icons/hi';
+import { HiUsers, HiCheckCircle, HiXCircle, HiPencil, HiTrash, HiSearch, HiPlus } from 'react-icons/hi';
 import { SwalConfig } from '../../components/SwalConfig';
 import showToast from '../../utils/toast';
-import CategorieCreateModal from './CategorieCreateModal';
-import CategorieEditModal from './CategorieEditModal';
+import CustomerCreateModal from './CustomerCreateModal';
+import CustomerEditModal from './CustomerEditModal';
 import StatsCard from '../../components/StatsCard';
 import Table from '../../components/Table';
 import UniversalButton from '../../components/UniversalButton';
 import UniversalInput from '../../components/UniversalInput';
 import UniversalSelect from '../../components/UniversalSelect';
 
-const CategoriesIndex = () => {
+const CustomerIndex = () => {
     const [loading, setLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
 
@@ -27,47 +27,61 @@ const CategoriesIndex = () => {
     }, []);
 
     // Dummy Data
-    const [categories, setCategories] = useState([
-        { id: 1, name: 'Starters', description: 'Appetizers and starters', status: 'Active' },
-        { id: 2, name: 'Main Course', description: 'Main dishes and entrees', status: 'Active' },
-        { id: 3, name: 'Desserts', description: 'Sweet dishes and desserts', status: 'Active' },
-        { id: 4, name: 'Beverages', description: 'Drinks and beverages', status: 'Active' },
-        { id: 5, name: 'Chinese', description: 'Chinese cuisine items', status: 'Deactive' },
+    const [customers, setCustomers] = useState([
+        { id: 1, name: 'Rajesh Kumar', mobile: '9876543210', address: '123, MG Road, Pune', internalNote: 'Regular customer', status: 'Active' },
+        { id: 2, name: 'Priya Sharma', mobile: '8765432109', address: '45, FC Road, Pune', internalNote: 'VIP customer', status: 'Active' },
+        { id: 3, name: 'Amit Patel', mobile: '7654321098', address: '88, Shivaji Nagar, Pune', internalNote: '', status: 'Active' },
+        { id: 4, name: 'Sneha Desai', mobile: '6543210987', address: '', internalNote: 'Prefers evening delivery', status: 'Deactive' },
+        { id: 5, name: 'Vikram Singh', mobile: '9988776655', address: '12, Kothrud, Pune', internalNote: '', status: 'Active' },
     ]);
 
     // Stats
-    const totalCategories = categories.length;
-    const activeCategories = categories.filter(c => c.status === 'Active').length;
-    const deactiveCategories = categories.filter(c => c.status === 'Deactive').length;
+    const totalCustomers = customers.length;
+    const activeCustomers = customers.filter(c => c.status === 'Active').length;
+    const deactiveCustomers = customers.filter(c => c.status === 'Deactive').length;
 
     // Filter Logic
-    const filteredCategories = categories.filter(category => {
-        const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            category.description.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = statusFilter === 'All' || category.status === statusFilter;
+    const filteredCustomers = customers.filter(customer => {
+        const matchesSearch = customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            customer.mobile.includes(searchTerm);
+        const matchesStatus = statusFilter === 'All' || customer.status === statusFilter;
         return matchesSearch && matchesStatus;
     });
 
-    const handleEdit = (category) => {
-        setSelectedCategory(category);
+    const handleEdit = (customer) => {
+        setSelectedCustomer(customer);
         setIsEditModalOpen(true);
     };
 
     const handleDelete = async (id) => {
         const result = await SwalConfig.confirmDelete(
-            'Delete Category?',
-            'Are you sure you want to delete this category? This action cannot be undone.'
+            'Delete Customer?',
+            'Are you sure you want to delete this customer? This action cannot be undone.'
         );
 
         if (result.isConfirmed) {
-            setCategories(categories.filter(c => c.id !== id));
-            showToast.success('Category has been deleted successfully.');
+            setCustomers(customers.filter(c => c.id !== id));
+            showToast.success('Customer has been deleted successfully.');
         }
     };
 
     const columns = [
-        { header: 'Category Name', key: 'name' },
-        { header: 'Description', key: 'description' },
+        { header: 'Customer Name', key: 'name' },
+        { header: 'Mobile', key: 'mobile' },
+        {
+            header: 'Address',
+            key: 'address',
+            render: (value) => (
+                <span className="max-w-xs truncate block" title={value}>{value || '-'}</span>
+            )
+        },
+        {
+            header: 'Internal Note',
+            key: 'internalNote',
+            render: (value) => (
+                <span className="max-w-xs truncate block" title={value}>{value || '-'}</span>
+            )
+        },
         {
             header: 'Status',
             key: 'status',
@@ -115,24 +129,24 @@ const CategoriesIndex = () => {
             {/* Header & Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <StatsCard
-                    title="Total Categories"
-                    value={totalCategories}
+                    title="Total Customers"
+                    value={totalCustomers}
                     color="blue"
                     loading={loading}
-                    icon={<HiCollection />}
+                    icon={<HiUsers />}
                 />
 
                 <StatsCard
-                    title="Active Categories"
-                    value={activeCategories}
+                    title="Active Customers"
+                    value={activeCustomers}
                     color="green"
                     loading={loading}
                     icon={<HiCheckCircle />}
                 />
 
                 <StatsCard
-                    title="Deactive Categories"
-                    value={deactiveCategories}
+                    title="Deactive Customers"
+                    value={deactiveCustomers}
                     color="red"
                     loading={loading}
                     icon={<HiXCircle />}
@@ -147,7 +161,7 @@ const CategoriesIndex = () => {
                             <UniversalInput
                                 type="text"
                                 loading={loading}
-                                placeholder="Search Category..."
+                                placeholder="Search Customer..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="mb-0"
@@ -173,40 +187,44 @@ const CategoriesIndex = () => {
                         icon={<HiPlus />}
                         className="w-full md:w-auto"
                     >
-                        Add Category
+                        Add Customer
                     </UniversalButton>
                 </div>
 
                 {/* Table */}
                 <Table
                     columns={columns}
-                    data={filteredCategories}
+                    data={filteredCustomers}
                     loading={loading}
                     actions={actions}
                 />
             </div>
 
             {/* Modals */}
-            {isCreateModalOpen && (
-                <CategorieCreateModal
-                    isOpen={isCreateModalOpen}
-                    onClose={() => setIsCreateModalOpen(false)}
-                />
-            )}
+            {
+                isCreateModalOpen && (
+                    <CustomerCreateModal
+                        isOpen={isCreateModalOpen}
+                        onClose={() => setIsCreateModalOpen(false)}
+                    />
+                )
+            }
 
-            {isEditModalOpen && selectedCategory && (
-                <CategorieEditModal
-                    isOpen={isEditModalOpen}
-                    onClose={() => {
-                        setIsEditModalOpen(false);
-                        setSelectedCategory(null);
-                    }}
-                    category={selectedCategory}
-                />
-            )}
+            {
+                isEditModalOpen && selectedCustomer && (
+                    <CustomerEditModal
+                        isOpen={isEditModalOpen}
+                        onClose={() => {
+                            setIsEditModalOpen(false);
+                            setSelectedCustomer(null);
+                        }}
+                        customer={selectedCustomer}
+                    />
+                )
+            }
 
-        </div>
+        </div >
     );
 };
 
-export default CategoriesIndex;
+export default CustomerIndex;

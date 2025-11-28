@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { HiCollection, HiCheckCircle, HiXCircle, HiPencil, HiTrash, HiSearch, HiPlus } from 'react-icons/hi';
+import { HiViewGridAdd, HiCheckCircle, HiXCircle, HiPencil, HiTrash, HiSearch, HiPlus } from 'react-icons/hi';
 import { SwalConfig } from '../../components/SwalConfig';
 import showToast from '../../utils/toast';
-import CategorieCreateModal from './CategorieCreateModal';
-import CategorieEditModal from './CategorieEditModal';
+import TableCreateModal from './TableCreateModal';
+import TableEditModal from './TableEditModal';
 import StatsCard from '../../components/StatsCard';
 import Table from '../../components/Table';
 import UniversalButton from '../../components/UniversalButton';
 import UniversalInput from '../../components/UniversalInput';
 import UniversalSelect from '../../components/UniversalSelect';
 
-const CategoriesIndex = () => {
+const TableIndex = () => {
     const [loading, setLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedTable, setSelectedTable] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
+    const [typeFilter, setTypeFilter] = useState('All');
 
     // Simulate data loading
     useEffect(() => {
@@ -27,54 +28,73 @@ const CategoriesIndex = () => {
     }, []);
 
     // Dummy Data
-    const [categories, setCategories] = useState([
-        { id: 1, name: 'Starters', description: 'Appetizers and starters', status: 'Active' },
-        { id: 2, name: 'Main Course', description: 'Main dishes and entrees', status: 'Active' },
-        { id: 3, name: 'Desserts', description: 'Sweet dishes and desserts', status: 'Active' },
-        { id: 4, name: 'Beverages', description: 'Drinks and beverages', status: 'Active' },
-        { id: 5, name: 'Chinese', description: 'Chinese cuisine items', status: 'Deactive' },
+    const [tables, setTables] = useState([
+        { id: 1, tableNumber: 'T-01', capacity: 4, status: 'Available', type: 'Family' },
+        { id: 2, tableNumber: 'T-02', capacity: 2, status: 'Occupied', type: 'Open' },
+        { id: 3, tableNumber: 'T-03', capacity: 6, status: 'Available', type: 'Private' },
+        { id: 4, tableNumber: 'T-04', capacity: 4, status: 'Reserved', type: 'Family' },
+        { id: 5, tableNumber: 'T-05', capacity: 8, status: 'Available', type: 'Private' },
+        { id: 6, tableNumber: 'T-06', capacity: 2, status: 'Occupied', type: 'Open' },
     ]);
 
     // Stats
-    const totalCategories = categories.length;
-    const activeCategories = categories.filter(c => c.status === 'Active').length;
-    const deactiveCategories = categories.filter(c => c.status === 'Deactive').length;
+    const totalTables = tables.length;
+    const availableTables = tables.filter(t => t.status === 'Available').length;
+    const occupiedTables = tables.filter(t => t.status === 'Occupied').length;
 
     // Filter Logic
-    const filteredCategories = categories.filter(category => {
-        const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            category.description.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = statusFilter === 'All' || category.status === statusFilter;
-        return matchesSearch && matchesStatus;
+    const filteredTables = tables.filter(table => {
+        const matchesSearch = table.tableNumber.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === 'All' || table.status === statusFilter;
+        const matchesType = typeFilter === 'All' || table.type === typeFilter;
+        return matchesSearch && matchesStatus && matchesType;
     });
 
-    const handleEdit = (category) => {
-        setSelectedCategory(category);
+    const handleEdit = (table) => {
+        setSelectedTable(table);
         setIsEditModalOpen(true);
     };
 
     const handleDelete = async (id) => {
         const result = await SwalConfig.confirmDelete(
-            'Delete Category?',
-            'Are you sure you want to delete this category? This action cannot be undone.'
+            'Delete Table?',
+            'Are you sure you want to delete this table? This action cannot be undone.'
         );
 
         if (result.isConfirmed) {
-            setCategories(categories.filter(c => c.id !== id));
-            showToast.success('Category has been deleted successfully.');
+            setTables(tables.filter(t => t.id !== id));
+            showToast.success('Table has been deleted successfully.');
         }
     };
 
     const columns = [
-        { header: 'Category Name', key: 'name' },
-        { header: 'Description', key: 'description' },
+        { header: 'Table Number', key: 'tableNumber' },
+        {
+            header: 'Capacity',
+            key: 'capacity',
+            render: (value) => (
+                <span className="font-medium">{value} Persons</span>
+            )
+        },
+        {
+            header: 'Type',
+            key: 'type',
+            render: (value) => (
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${value === 'Family' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
+                        value === 'Private' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
+                            'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+                    }`}>
+                    {value}
+                </span>
+            )
+        },
         {
             header: 'Status',
             key: 'status',
             render: (value) => (
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${value === 'Active'
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${value === 'Available' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                        value === 'Occupied' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                     }`}>
                     {value}
                 </span>
@@ -115,24 +135,24 @@ const CategoriesIndex = () => {
             {/* Header & Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <StatsCard
-                    title="Total Categories"
-                    value={totalCategories}
+                    title="Total Tables"
+                    value={totalTables}
                     color="blue"
                     loading={loading}
-                    icon={<HiCollection />}
+                    icon={<HiViewGridAdd />}
                 />
 
                 <StatsCard
-                    title="Active Categories"
-                    value={activeCategories}
+                    title="Available Tables"
+                    value={availableTables}
                     color="green"
                     loading={loading}
                     icon={<HiCheckCircle />}
                 />
 
                 <StatsCard
-                    title="Deactive Categories"
-                    value={deactiveCategories}
+                    title="Occupied Tables"
+                    value={occupiedTables}
                     color="red"
                     loading={loading}
                     icon={<HiXCircle />}
@@ -142,12 +162,12 @@ const CategoriesIndex = () => {
             {/* Actions & Filters */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-                    <div className="flex gap-4 w-full md:w-auto items-end">
+                    <div className="flex gap-4 w-full md:w-auto items-end flex-wrap">
                         <div className="w-full md:w-64">
                             <UniversalInput
                                 type="text"
                                 loading={loading}
-                                placeholder="Search Category..."
+                                placeholder="Search Table..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="mb-0"
@@ -156,12 +176,25 @@ const CategoriesIndex = () => {
                         </div>
                         <UniversalSelect
                             loading={loading}
+                            value={typeFilter}
+                            onChange={(e) => setTypeFilter(e.target.value)}
+                            options={[
+                                { value: 'All', label: 'All Types' },
+                                { value: 'Family', label: 'Family' },
+                                { value: 'Open', label: 'Open' },
+                                { value: 'Private', label: 'Private' }
+                            ]}
+                            className="mb-0 w-full md:w-auto min-w-[150px]"
+                        />
+                        <UniversalSelect
+                            loading={loading}
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
                             options={[
                                 { value: 'All', label: 'All Status' },
-                                { value: 'Active', label: 'Active' },
-                                { value: 'Deactive', label: 'Deactive' }
+                                { value: 'Available', label: 'Available' },
+                                { value: 'Occupied', label: 'Occupied' },
+                                { value: 'Reserved', label: 'Reserved' }
                             ]}
                             className="mb-0 w-full md:w-auto min-w-[150px]"
                         />
@@ -173,14 +206,14 @@ const CategoriesIndex = () => {
                         icon={<HiPlus />}
                         className="w-full md:w-auto"
                     >
-                        Add Category
+                        Add Table
                     </UniversalButton>
                 </div>
 
                 {/* Table */}
                 <Table
                     columns={columns}
-                    data={filteredCategories}
+                    data={filteredTables}
                     loading={loading}
                     actions={actions}
                 />
@@ -188,20 +221,20 @@ const CategoriesIndex = () => {
 
             {/* Modals */}
             {isCreateModalOpen && (
-                <CategorieCreateModal
+                <TableCreateModal
                     isOpen={isCreateModalOpen}
                     onClose={() => setIsCreateModalOpen(false)}
                 />
             )}
 
-            {isEditModalOpen && selectedCategory && (
-                <CategorieEditModal
+            {isEditModalOpen && selectedTable && (
+                <TableEditModal
                     isOpen={isEditModalOpen}
                     onClose={() => {
                         setIsEditModalOpen(false);
-                        setSelectedCategory(null);
+                        setSelectedTable(null);
                     }}
-                    category={selectedCategory}
+                    table={selectedTable}
                 />
             )}
 
@@ -209,4 +242,4 @@ const CategoriesIndex = () => {
     );
 };
 
-export default CategoriesIndex;
+export default TableIndex;

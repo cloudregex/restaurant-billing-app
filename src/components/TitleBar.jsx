@@ -34,11 +34,12 @@ const TitleBar = () => {
 
     const menuItems = [
         { name: 'Dashboard', path: '/dashboard' },
-        { name: 'Add Bill', path: '/add-bill' },
+        { name: 'Add Bill', path: '/billing' },
         { name: 'Supplier', path: '/supplier' },
         { name: 'Table', path: '/table' },
         { name: 'Menu', path: '/menu' },
         { name: 'Category', path: '/category' },
+        { name: 'Tax', path: '/tax' },
         { name: 'Customer', path: '/customer' },
         { name: 'Income', path: '/income' },
         { name: 'Expense', path: '/expense' },
