@@ -9,43 +9,98 @@ const TitleBar = () => {
     const [showNotifications, setShowNotifications] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
     const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+    const [openSubmenu, setOpenSubmenu] = useState(null);
 
     const notificationRef = useRef(null);
     const profileRef = useRef(null);
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (notificationRef.current && !notificationRef.current.contains(event.target)) {
-                setShowNotifications(false);
-            }
-            if (profileRef.current && !profileRef.current.contains(event.target)) {
-                setShowProfile(false);
-            }
-        };
+    // Timeouts for hover delays
+    const submenuTimeoutRef = useRef(null);
+    const profileTimeoutRef = useRef(null);
+    const notificationTimeoutRef = useRef(null);
 
-        document.addEventListener('mousedown', handleClickOutside);
+    // --- Notification Hover Logic ---
+    const handleNotificationMouseEnter = () => {
+        if (notificationTimeoutRef.current) {
+            clearTimeout(notificationTimeoutRef.current);
+        }
+        setShowNotifications(true);
+    };
+
+    const handleNotificationMouseLeave = () => {
+        notificationTimeoutRef.current = setTimeout(() => {
+            setShowNotifications(false);
+        }, 300);
+    };
+
+    // --- Profile Hover Logic ---
+    const handleProfileMouseEnter = () => {
+        if (profileTimeoutRef.current) {
+            clearTimeout(profileTimeoutRef.current);
+        }
+        setShowProfile(true);
+    };
+
+    const handleProfileMouseLeave = () => {
+        profileTimeoutRef.current = setTimeout(() => {
+            setShowProfile(false);
+        }, 300);
+    };
+
+    // --- Submenu Hover Logic ---
+    const handleSubmenuMouseEnter = (itemName) => {
+        if (submenuTimeoutRef.current) {
+            clearTimeout(submenuTimeoutRef.current);
+        }
+        setOpenSubmenu(itemName);
+    };
+
+    const handleSubmenuMouseLeave = () => {
+        submenuTimeoutRef.current = setTimeout(() => {
+            setOpenSubmenu(null);
+        }, 300);
+    };
+
+    useEffect(() => {
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            if (submenuTimeoutRef.current) clearTimeout(submenuTimeoutRef.current);
+            if (profileTimeoutRef.current) clearTimeout(profileTimeoutRef.current);
+            if (notificationTimeoutRef.current) clearTimeout(notificationTimeoutRef.current);
         };
     }, []);
 
-    // Check if current page is an auth page
     const isAuthPage = ['/', '/register', '/otp', '/forgot-password', '/reset-password'].includes(location.pathname);
 
     const menuItems = [
         { name: 'Dashboard', path: '/dashboard' },
         { name: 'Add Bill', path: '/billing' },
         { name: 'Supplier', path: '/supplier' },
-        { name: 'Table', path: '/table' },
+        {
+            name: 'Finance',
+            submenu: [
+                { name: 'Income', path: '/income' },
+                { name: 'Expenses', path: '/expense' }
+            ]
+        },
+        {
+            name: 'Settings',
+            submenu: [
+                { name: 'Table', path: '/table' },
+                { name: 'Category', path: '/category' },
+                { name: 'Tax', path: '/tax' }
+            ]
+        },
         { name: 'Menu', path: '/menu' },
-        { name: 'Category', path: '/category' },
-        { name: 'Tax', path: '/tax' },
         { name: 'Customer', path: '/customer' },
-        { name: 'Income', path: '/income' },
-        { name: 'Expense', path: '/expense' },
-        { name: 'Reports', path: '/reports' },
+        {
+            name: 'Reports',
+            submenu: [
+                { name: 'Transactions', path: '/transactions' },
+                { name: 'Bill Reports', path: '/reports' },
+                { name: 'Purchase Reports', path: '/purchase-reports' }
+            ]
+        },
         { name: 'Employee', path: '/employee' },
-        { name: 'Transactions', path: '/transactions' },
     ];
 
     const handleMinimize = async () => {
@@ -84,10 +139,10 @@ const TitleBar = () => {
     };
 
     const handleLogout = () => {
+        setShowProfile(false);
         navigate('/');
     };
 
-    // Conditional classes based on page type
     const bgClass = isAuthPage
         ? 'bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900'
         : 'bg-gray-200 dark:bg-gray-900';
@@ -122,28 +177,80 @@ const TitleBar = () => {
 
                 {/* Navigation Menu - Only on non-auth pages */}
                 {!isAuthPage && (
-                    <div className="flex-1 flex items-center justify-center px-4 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+                    <div className="flex-1 flex items-center justify-center px-4">
                         <div className="flex items-center gap-1">
-                            {menuItems.map((item) => (
-                                <NavLink
-                                    key={item.name}
-                                    to={item.path}
-                                    className={({ isActive }) =>
-                                        `px-3 py-1.5 rounded text-sm font-medium transition-colors whitespace-nowrap ${isActive
-                                            ? 'bg-blue-600 text-white'
-                                            : `${textClass} hover:bg-gray-300 dark:hover:bg-gray-700`
-                                        }`
-                                    }
-                                >
-                                    {item.name}
-                                </NavLink>
-                            ))}
+                            {menuItems.map((item) => {
+                                // Logic: Check if any submenu item matches the current URL
+                                const isActiveParent = item.submenu
+                                    ? item.submenu.some(subItem => location.pathname === subItem.path)
+                                    : false;
+
+                                return (
+                                    <div
+                                        key={item.name}
+                                        className="relative"
+                                        onMouseEnter={() => item.submenu && handleSubmenuMouseEnter(item.name)}
+                                        onMouseLeave={() => item.submenu && handleSubmenuMouseLeave()}
+                                    >
+                                        {item.submenu ? (
+                                            <>
+                                                <button
+                                                    // Updated className logic: Checks openSubmenu OR isActiveParent
+                                                    className={`px-3 py-1.5 rounded text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-1 ${openSubmenu === item.name || isActiveParent
+                                                        ? 'bg-blue-600 text-white'
+                                                        : `${textClass} hover:bg-gray-300 dark:hover:bg-gray-700`
+                                                        }`}
+                                                >
+                                                    {item.name}
+                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </button>
+                                                {openSubmenu === item.name && (
+                                                    <div
+                                                        className="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50"
+                                                        onMouseEnter={() => handleSubmenuMouseEnter(item.name)}
+                                                        onMouseLeave={handleSubmenuMouseLeave}
+                                                    >
+                                                        {item.submenu.map((subItem) => (
+                                                            <NavLink
+                                                                key={subItem.name}
+                                                                to={subItem.path}
+                                                                className={({ isActive }) =>
+                                                                    `block px-4 py-2 text-sm transition-colors ${isActive
+                                                                        ? 'bg-blue-600 text-white'
+                                                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                                                    }`
+                                                                }
+                                                                onClick={() => setOpenSubmenu(null)}
+                                                            >
+                                                                {subItem.name}
+                                                            </NavLink>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <NavLink
+                                                to={item.path}
+                                                className={({ isActive }) =>
+                                                    `px-3 py-1.5 rounded text-sm font-medium transition-colors whitespace-nowrap ${isActive
+                                                        ? 'bg-blue-600 text-white'
+                                                        : `${textClass} hover:bg-gray-300 dark:hover:bg-gray-700`
+                                                    }`
+                                                }
+                                            >
+                                                {item.name}
+                                            </NavLink>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 )}
 
                 <div className="flex items-center gap-2">
-                    {/* Show theme toggle, notifications, and profile only on Dashboard */}
                     {!isAuthPage && (
                         <div className="flex items-center gap-1">
                             <button onClick={toggleTheme} className={`w-10 h-10 flex items-center justify-center rounded transition-colors ${hoverClass}`} title="Toggle Dark/Light Mode">
@@ -158,15 +265,28 @@ const TitleBar = () => {
                                 )}
                             </button>
 
-                            <div className="relative" ref={notificationRef}>
-                                <button onClick={() => setShowNotifications(!showNotifications)} className={`w-10 h-10 flex items-center justify-center rounded transition-colors relative ${hoverClass}`} title="Notifications">
+                            {/* Notification Dropdown */}
+                            <div
+                                className="relative"
+                                ref={notificationRef}
+                                onMouseEnter={handleNotificationMouseEnter}
+                                onMouseLeave={handleNotificationMouseLeave}
+                            >
+                                <button
+                                    className={`w-10 h-10 flex items-center justify-center rounded transition-colors relative ${hoverClass}`}
+                                    title="Notifications"
+                                >
                                     <svg className={`w-5 h-5 ${iconClass}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                                     </svg>
                                     <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
                                 </button>
                                 {showNotifications && (
-                                    <div className="absolute top-full right-0 mt-1 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                                    <div
+                                        className="absolute top-full right-0 mt-1 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
+                                        onMouseEnter={handleNotificationMouseEnter}
+                                        onMouseLeave={handleNotificationMouseLeave}
+                                    >
                                         <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                                             <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Notifications</p>
                                         </div>
@@ -180,8 +300,17 @@ const TitleBar = () => {
                                 )}
                             </div>
 
-                            <div className="relative" ref={profileRef}>
-                                <button onClick={() => setShowProfile(!showProfile)} className={`w-10 h-10 flex items-center justify-center rounded transition-colors ${hoverClass}`} title="Profile">
+                            {/* Profile Dropdown */}
+                            <div
+                                className="relative"
+                                onMouseEnter={handleProfileMouseEnter}
+                                onMouseLeave={handleProfileMouseLeave}
+                                ref={profileRef}
+                            >
+                                <button
+                                    className={`w-10 h-10 flex items-center justify-center rounded transition-colors ${hoverClass}`}
+                                    title="Profile"
+                                >
                                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
                                         <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
@@ -189,13 +318,17 @@ const TitleBar = () => {
                                     </div>
                                 </button>
                                 {showProfile && (
-                                    <div className="absolute top-full right-0 mt-1 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                                    <div
+                                        className="absolute top-full right-0 mt-1 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50"
+                                        onMouseEnter={handleProfileMouseEnter}
+                                        onMouseLeave={handleProfileMouseLeave}
+                                    >
                                         <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                                             <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">Admin</p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">admin@restaurant.com</p>
                                         </div>
-                                        <button className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">My Profile</button>
-                                        <button className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Settings</button>
+                                        <button onClick={() => setShowProfile(false)} className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">My Profile</button>
+                                        <button onClick={() => setShowProfile(false)} className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Settings</button>
                                         <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
                                         <button onClick={handleLogout} className="w-full px-4 py-3 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Logout</button>
                                     </div>
