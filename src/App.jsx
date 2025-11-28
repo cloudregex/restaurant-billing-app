@@ -4,6 +4,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import SplashScreen from './components/SplashScreen';
 import TitleBar from './components/TitleBar';
 import ErrorBoundary from './components/ErrorBoundary';
+import ToastConfig from './components/ToastConfig';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import OTP from './pages/auth/OTP';
@@ -52,6 +53,7 @@ function App() {
       <Router>
         <ErrorBoundary>
           <Layout />
+          <ToastConfig />
         </ErrorBoundary>
       </Router>
     </ThemeProvider>
