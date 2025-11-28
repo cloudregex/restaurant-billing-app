@@ -101,13 +101,11 @@ const SupplierIndex = () => {
             label: (
                 <UniversalButton
                     color="blue"
-                    variant="text"
+                    variant="filled"
                     size="sm"
                     icon={<HiPencil className="w-4 h-4" />}
                     iconOnly
-                >
-                    Edit
-                </UniversalButton>
+                />
             ),
             onClick: handleEdit
         },
@@ -115,13 +113,11 @@ const SupplierIndex = () => {
             label: (
                 <UniversalButton
                     color="red"
-                    variant="text"
+                    variant="filled"
                     size="sm"
                     icon={<HiTrash className="w-4 h-4" />}
                     iconOnly
-                >
-                    Delete
-                </UniversalButton>
+                />
             ),
             onClick: (row) => handleDelete(row.id)
         }

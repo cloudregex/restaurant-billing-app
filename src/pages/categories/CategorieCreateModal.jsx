@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { HiX, HiSave, HiBan } from 'react-icons/hi';
 import UniversalInput from '../../components/UniversalInput';
 import UniversalTextarea from '../../components/UniversalTextarea';
 import UniversalButton from '../../components/UniversalButton';
+
+import showToast from '../../utils/toast';
 
 const CategorieCreateModal = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState({
@@ -25,6 +28,7 @@ const CategorieCreateModal = ({ isOpen, onClose }) => {
         e.preventDefault();
         if (validate()) {
             console.log('Creating Category:', formData);
+            showToast.success('Category created successfully!');
             onClose();
         }
     };
@@ -42,11 +46,15 @@ const CategorieCreateModal = ({ isOpen, onClose }) => {
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md animate-scale-in">
                 <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
                     <h2 className="text-xl font-bold text-gray-800 dark:text-white">Add New Category</h2>
-                    <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+                    <UniversalButton
+                        onClick={onClose}
+                        variant="text"
+                        color="gray"
+                        size="sm"
+                        icon={<HiX className="w-5 h-5" />}
+                        iconOnly
+                        className="!p-1"
+                    />
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -76,8 +84,9 @@ const CategorieCreateModal = ({ isOpen, onClose }) => {
                             type="button"
                             onClick={onClose}
                             color="gray"
-                            variant="outlined"
+                            variant="filled"
                             className="flex-1"
+                            icon={<HiBan className="w-5 h-5" />}
                         >
                             Cancel
                         </UniversalButton>
@@ -86,6 +95,7 @@ const CategorieCreateModal = ({ isOpen, onClose }) => {
                             color="blue"
                             variant="filled"
                             className="flex-1"
+                            icon={<HiSave className="w-5 h-5" />}
                         >
                             Save Category
                         </UniversalButton>

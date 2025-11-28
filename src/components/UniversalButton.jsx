@@ -59,7 +59,7 @@ const UniversalButton = ({
         }
     };
 
-    const baseClasses = 'inline-flex items-center rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-[1.03] active:scale-[0.97] shadow-md hover:shadow-lg';
+    const baseClasses = 'inline-flex items-center justify-center rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-all duration-300 transform hover:scale-[1.03] active:scale-[0.97] shadow-md hover:shadow-lg';
 
     const sizeClasses = {
         sm: 'px-3 py-1.5 text-xs',
