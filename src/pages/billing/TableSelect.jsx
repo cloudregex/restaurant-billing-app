@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { HiArrowLeft, HiUserGroup, HiCurrencyRupee, HiCheckCircle, HiClock, HiBan } from 'react-icons/hi';
+import { HiArrowLeft, HiUserGroup, HiCurrencyRupee, HiCheckCircle, HiClock, HiBan, HiSearch } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import UniversalButton from '../../components/UniversalButton';
+import UniversalInput from '../../components/UniversalInput';
+
+// --- TableSelect Component ---
 
 const TableSelect = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All'); // 'All', 'Available', 'Occupied', 'Reserved'
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -25,13 +30,25 @@ const TableSelect = () => {
         { id: 8, number: 'T-08', capacity: 6, status: 'Available', currentBill: 0 },
         { id: 9, number: 'T-09', capacity: 4, status: 'Available', currentBill: 0 },
         { id: 10, number: 'T-10', capacity: 10, status: 'Reserved', currentBill: 0 },
+        { id: 11, number: 'T-11', capacity: 10, status: 'Reserved', currentBill: 0 },
+        { id: 12, number: 'T-12', capacity: 10, status: 'Available', currentBill: 0 },
+        { id: 13, number: 'T-13', capacity: 10, status: 'Reserved', currentBill: 0 },
+        { id: 14, number: 'T-14', capacity: 10, status: 'Available', currentBill: 0 },
+        { id: 15, number: 'T-15', capacity: 10, status: 'Reserved', currentBill: 0 },
     ];
 
     const handleTableSelect = (table) => {
         navigate(`/billing/create/${table.number}`);
     };
 
-    // Stats Calculation
+    // Filter tables based on search and status
+    const filteredTables = tables.filter(table => {
+        const matchesSearch = table.number.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesStatus = statusFilter === 'All' || table.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    });
+
+    // Stats Calculation (based on all tables, not filtered)
     const totalTables = tables.length;
     const occupied = tables.filter(t => t.status === 'Occupied').length;
     const available = tables.filter(t => t.status === 'Available').length;
@@ -40,8 +57,8 @@ const TableSelect = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-slate-900 p-6 transition-colors duration-300">
-                <div className="max-w-7xl mx-auto">
-                    {/* Header Skeleton */}
+                <div className="max-w-8xl mx-auto">
+                    {/* Header Section Skeleton */}
                     <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
                         <div className="flex items-center gap-4 w-full md:w-auto">
                             <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
@@ -49,6 +66,11 @@ const TableSelect = () => {
                                 <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
                                 <div className="h-4 w-36 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
                             </div>
+                        </div>
+
+                        {/* 🔥 NEW: Search Input Skeleton */}
+                        <div className="w-full md:w-64">
+                            <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
                         </div>
 
                         {/* Stats Skeleton */}
@@ -67,7 +89,7 @@ const TableSelect = () => {
 
                     {/* Grid Skeleton */}
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((i) => (
                             <div
                                 key={i}
                                 className="group relative overflow-hidden rounded-2xl p-5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700"
@@ -94,12 +116,12 @@ const TableSelect = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-slate-900 p-6 transition-colors duration-300">
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-8xl mx-auto">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
                     <div className="flex items-center gap-4 w-full md:w-auto">
                         <UniversalButton
-                            onClick={() => navigate('/billing')}
+                            onClick={() => navigate('/billing-list')}
                             color="white"
                             className="shadow-md hover:shadow-lg transition-shadow dark:bg-gray-800 dark:text-white"
                             icon={<HiArrowLeft className="w-5 h-5" />}
@@ -113,18 +135,57 @@ const TableSelect = () => {
                         </div>
                     </div>
 
-                    {/* Stats Cards */}
+                    {/* Search Input */}
+                    <div className="w-full md:w-64">
+                        <UniversalInput
+                            type="text"
+                            placeholder="Search table..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            leftIcon={<HiSearch className="w-5 h-5" />}
+                        />
+                    </div>
+
+                    {/* Stats Cards - Now Clickable */}
                     <div className="flex gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
-                        <StatusBadge count={totalTables} label="Total" color="blue" icon={<HiUserGroup />} />
-                        <StatusBadge count={available} label="Available" color="green" icon={<HiCheckCircle />} />
-                        <StatusBadge count={occupied} label="Occupied" color="red" icon={<HiBan />} />
-                        <StatusBadge count={reserved} label="Reserved" color="yellow" icon={<HiClock />} />
+                        <StatusBadge
+                            count={totalTables}
+                            label="Total"
+                            color="blue"
+                            icon={<HiUserGroup />}
+                            onClick={() => setStatusFilter('All')}
+                            isActive={statusFilter === 'All'}
+                        />
+                        <StatusBadge
+                            count={available}
+                            label="Available"
+                            color="green"
+                            icon={<HiCheckCircle />}
+                            onClick={() => setStatusFilter('Available')}
+                            isActive={statusFilter === 'Available'}
+                        />
+                        <StatusBadge
+                            count={occupied}
+                            label="Occupied"
+                            color="red"
+                            icon={<HiBan />}
+                            onClick={() => setStatusFilter('Occupied')}
+                            isActive={statusFilter === 'Occupied'}
+                        />
+                        <StatusBadge
+                            count={reserved}
+                            label="Reserved"
+                            color="yellow"
+                            icon={<HiClock />}
+                            onClick={() => setStatusFilter('Reserved')}
+                            isActive={statusFilter === 'Reserved'}
+                        />
                     </div>
                 </div>
 
                 {/* Grid Layout */}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                    {tables.map((table, index) => (
+                    {filteredTables.map((table, index) => (
                         <div
                             key={table.id}
                             onClick={() => handleTableSelect(table)}
@@ -197,7 +258,7 @@ const TableSelect = () => {
     );
 };
 
-const StatusBadge = ({ count, label, color, icon }) => {
+const StatusBadge = ({ count, label, color, icon, onClick, isActive }) => {
     const colorClasses = {
         blue: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
         green: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
@@ -205,8 +266,18 @@ const StatusBadge = ({ count, label, color, icon }) => {
         yellow: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400',
     };
 
+    const activeRingClasses = {
+        blue: 'ring-2 ring-blue-500',
+        green: 'ring-2 ring-green-500',
+        red: 'ring-2 ring-red-500',
+        yellow: 'ring-2 ring-yellow-500',
+    };
+
     return (
-        <div className="flex items-center gap-3 bg-white dark:bg-gray-800 px-4 py-2 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 min-w-[140px]">
+        <div
+            onClick={onClick}
+            className={`flex items-center gap-3 bg-white dark:bg-gray-800 px-4 py-2 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 min-w-[140px] transition-all cursor-pointer hover:shadow-md ${isActive ? activeRingClasses[color] : ''}`}
+        >
             <div className={`p-2 rounded-lg ${colorClasses[color]}`}>
                 {React.cloneElement(icon, { className: "w-5 h-5" })}
             </div>

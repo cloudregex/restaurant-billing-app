@@ -42,7 +42,7 @@ const Layout = () => {
           <Route path="/tax" element={<TaxIndex />} />
           <Route path="/menu" element={<MenuIndex />} />
           <Route path="/table" element={<TableIndex />} />
-          <Route path="/billing" element={<BillingIndex />} />
+          <Route path="/billing-list" element={<BillingIndex />} />
           <Route path="/billing/table-select" element={<TableSelect />} />
           <Route path="/billing/create/:tableNumber" element={<BillingCreate />} />
         </Routes>

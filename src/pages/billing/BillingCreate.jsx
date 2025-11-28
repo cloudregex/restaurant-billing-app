@@ -273,8 +273,7 @@ const BillingCreate = () => {
             {/* Right: Bill */}
             <div className="w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col">
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-1">Current Bill</h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Table: {tableNumber}</p>
+                    <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-1">Current Bill :- {tableNumber}</h2>
 
                     {/* Customer Selection */}
                     <div className="space-y-3">

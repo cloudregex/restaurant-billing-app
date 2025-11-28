@@ -73,8 +73,13 @@ const TitleBar = () => {
 
     const menuItems = [
         { name: 'Dashboard', path: '/dashboard' },
-        { name: 'Add Bill', path: '/billing' },
+        { name: 'POS', path: '/billing/table-select' },
+        { name: 'Bills List', path: '/billing-list' },
+        { name: 'Purchase', path: '/purchase' },
+        { name: 'Menu', path: '/menu' },
         { name: 'Supplier', path: '/supplier' },
+        { name: 'Employees', path: '/employee' },
+        { name: 'Customers', path: '/customer' },
         {
             name: 'Finance',
             submenu: [
@@ -90,8 +95,6 @@ const TitleBar = () => {
                 { name: 'Tax', path: '/tax' }
             ]
         },
-        { name: 'Menu', path: '/menu' },
-        { name: 'Customer', path: '/customer' },
         {
             name: 'Reports',
             submenu: [
@@ -100,7 +103,6 @@ const TitleBar = () => {
                 { name: 'Purchase Reports', path: '/purchase-reports' }
             ]
         },
-        { name: 'Employee', path: '/employee' },
     ];
 
     const handleMinimize = async () => {
