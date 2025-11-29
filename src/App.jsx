@@ -21,6 +21,9 @@ import BillingIndex from './pages/billing/BillingIndex';
 import TableSelect from './pages/billing/TableSelect';
 import BillingCreate from './pages/billing/BillingCreate';
 import EmployeeIndex from './pages/employee/EmployeeIndex';
+import PurchaseIndex from './pages/purchase/PurchaseIndex';
+import PurchaseCreate from './pages/purchase/PurchaseCreate';
+import PurchaseEdit from './pages/purchase/PurchaseEdit';
 
 const Layout = () => {
   const location = useLocation();
@@ -47,6 +50,9 @@ const Layout = () => {
           <Route path="/billing/table-select" element={<TableSelect />} />
           <Route path="/billing/create/:tableNumber" element={<BillingCreate />} />
           <Route path="/employee" element={<EmployeeIndex />} />
+          <Route path="/purchase" element={<PurchaseIndex />} />
+          <Route path="/purchase/create" element={<PurchaseCreate />} />
+          <Route path="/purchase/edit/:id" element={<PurchaseEdit />} />
         </Routes>
       </div>
     </div>
