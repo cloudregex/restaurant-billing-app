@@ -23,6 +23,8 @@ const BillingCreate = () => {
     const [paymentMethod, setPaymentMethod] = useState('Google Pay');
     const [showPrintModal, setShowPrintModal] = useState(false);
     const [billSearchTerm, setBillSearchTerm] = useState('');
+    const [discount, setDiscount] = useState(0);
+    const [showDiscountInput, setShowDiscountInput] = useState(false);
 
     // Dummy customer data
     const customers = [
@@ -104,7 +106,7 @@ const BillingCreate = () => {
 
     const subtotal = billItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const tax = subtotal * 0.05;
-    const total = subtotal + tax;
+    const total = subtotal + tax - discount;
 
     // Initialize/Update split amounts when total changes
     React.useEffect(() => {
@@ -495,11 +497,50 @@ const BillingCreate = () => {
                         <span>Subtotal</span>
                         <span className="font-medium">₹{subtotal.toFixed(2)}</span>
                     </div>
+
+                    {/* Discount Section */}
+                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                        <span>Discount</span>
+                        {showDiscountInput ? (
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="number"
+                                    value={discount}
+                                    onChange={(e) => {
+                                        const val = parseFloat(e.target.value) || 0;
+                                        if (val >= 0 && val <= subtotal + tax) {
+                                            setDiscount(val);
+                                        }
+                                    }}
+                                    onBlur={() => setShowDiscountInput(false)}
+                                    className="w-20 px-2 py-0.5 text-xs rounded border border-blue-500 dark:border-blue-400 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none"
+                                    placeholder="0"
+                                    autoFocus
+                                />
+                                <button
+                                    onClick={() => {
+                                        setDiscount(0);
+                                        setShowDiscountInput(false);
+                                    }}
+                                    className="text-red-500 hover:text-red-700"
+                                >
+                                    <HiX className="w-3 h-3" />
+                                </button>
+                            </div>
+                        ) : (
+                            <span
+                                className="font-medium cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                onClick={() => setShowDiscountInput(true)}
+                            >
+                                ₹{discount.toFixed(2)}
+                            </span>
+                        )}
+                    </div>
+
                     <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                         <span>Tax (5%)</span>
                         <span className="font-medium">₹{tax.toFixed(2)}</span>
                     </div>
-
                     {/* Split Bill Section - Moved Above Total */}
                     <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
                         <button
