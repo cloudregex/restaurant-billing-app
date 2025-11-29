@@ -62,6 +62,10 @@ const BillingCreate = () => {
         { id: 6, name: 'Masala Dosa', marathiName: 'मसाला डोसा', category: 'Main Course', price: 120, image: '' },
         { id: 7, name: 'Samosa', marathiName: 'समोसा', category: 'Starters', price: 40, image: '' },
         { id: 8, name: 'Dal Tadka', marathiName: 'डाळ तडका', category: 'Main Course', price: 180, image: '' },
+        { id: 9, name: 'Gulab Jamun', marathiName: 'गुलाब जामुन', category: 'Desserts', price: 80, image: '' },
+        { id: 10, name: 'Cold Coffee', marathiName: 'कोल्ड कॉफी', category: 'Beverages', price: 100, image: '' },
+        { id: 11, name: 'Masala Dosa', marathiName: 'मसाला डोसा', category: 'Main Course', price: 120, image: '' },
+        { id: 12, name: 'Samosa', marathiName: 'समोसा', category: 'Starters', price: 40, image: '' },
     ];
 
     const filteredProducts = products.filter(p => {
@@ -248,7 +252,7 @@ const BillingCreate = () => {
         <div className="h-[calc(100vh-40px)] bg-gray-50 dark:bg-gray-900 flex">
             {/* Left: Categories */}
             <div className="w-56 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-10 shadow-lg">
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 relative">
+                <div className="p-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 relative">
                     {/* Decorative background elements */}
                     <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
                     <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-20 h-20 bg-purple-500/10 rounded-full blur-xl"></div>
@@ -276,15 +280,15 @@ const BillingCreate = () => {
                                         <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">Active Table</span>
                                     </div>
                                 </div>
-                                <div className="p-3">
+                                <div className="p-1">
                                     <UniversalSelect
                                         value={tableNumber}
+                                        searchable={true}
                                         onChange={(e) => navigate(`/billing/create/${e.target.value}`)}
                                         options={tables.map(t => {
-                                            const statusIcon = t.status === 'Available' ? '🟢' : t.status === 'Occupied' ? '🔴' : '🟡';
                                             return {
                                                 value: t.id,
-                                                label: `${t.name} ${statusIcon}`
+                                                label: `${t.name}-${t.status}`
                                             };
                                         })}
                                         placeholder="Select Table"
@@ -347,26 +351,34 @@ const BillingCreate = () => {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {filteredProducts.map(product => (
-                        <div
-                            key={product.id}
-                            onClick={() => handleAddToBill(product)}
-                            className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-all cursor-pointer"
-                        >
-                            <div className="h-32 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                                {product.image ? (
-                                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    <span className="text-5xl">🍽️</span>
-                                )}
+                    {filteredProducts.length > 0 ? (
+                        filteredProducts.map(product => (
+                            <div
+                                key={product.id}
+                                onClick={() => handleAddToBill(product)}
+                                className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition-all cursor-pointer"
+                            >
+                                <div className="h-32 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                                    {product.image ? (
+                                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-5xl">🍽️</span>
+                                    )}
+                                </div>
+                                <div className="p-3">
+                                    <h3 className="font-bold text-gray-800 dark:text-white text-sm mb-1">{product.name}</h3>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{product.marathiName}</p>
+                                    <p className="text-lg font-bold text-blue-600 dark:text-blue-400">₹{product.price}</p>
+                                </div>
                             </div>
-                            <div className="p-3">
-                                <h3 className="font-bold text-gray-800 dark:text-white text-sm mb-1">{product.name}</h3>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{product.marathiName}</p>
-                                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">₹{product.price}</p>
-                            </div>
+                        ))
+                    ) : (
+                        <div className="col-span-full flex flex-col items-center justify-center py-16">
+                            <div className="text-6xl mb-4">🔍</div>
+                            <p className="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No Products Found</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-500">Try Adjusting Your Search.</p>
                         </div>
-                    ))}
+                    )}
                 </div>
             </div>
 
