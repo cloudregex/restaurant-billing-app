@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { HiCollection, HiCheckCircle, HiXCircle, HiPencil, HiTrash, HiSearch, HiPlus } from 'react-icons/hi';
+import { HiCurrencyDollar, HiCheckCircle, HiXCircle, HiPencil, HiTrash, HiSearch, HiPlus } from 'react-icons/hi';
 import { SwalConfig } from '../../components/SwalConfig';
 import showToast from '../../utils/toast';
-import CategorieCreateModal from './CategorieCreateModal';
-import CategorieEditModal from './CategorieEditModal';
+import IncomeCreateModal from './IncomeCreateModal';
+import IncomeEditModal from './IncomeEditModal';
 import StatsCard from '../../components/StatsCard';
 import Table from '../../components/Table';
 import UniversalButton from '../../components/UniversalButton';
 import UniversalInput from '../../components/UniversalInput';
 import UniversalSelect from '../../components/UniversalSelect';
 
-const CategoriesIndex = () => {
+const IncomeIndex = () => {
     const [loading, setLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedIncome, setSelectedIncome] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
 
@@ -27,67 +27,63 @@ const CategoriesIndex = () => {
     }, []);
 
     // Dummy Data
-    const [categories, setCategories] = useState([
-        { id: 1, name: 'Starters', type: 'Menu', description: 'Appetizers and starters', status: 'Active' },
-        { id: 2, name: 'Main Course', type: 'Menu', description: 'Main dishes and entrees', status: 'Active' },
-        { id: 3, name: 'Desserts', type: 'Menu', description: 'Sweet dishes and desserts', status: 'Active' },
-        { id: 4, name: 'Beverages', type: 'Menu', description: 'Drinks and beverages', status: 'Active' },
-        { id: 5, name: 'Chinese', type: 'Menu', description: 'Chinese cuisine items', status: 'Deactive' },
+    const [incomes, setIncomes] = useState([
+        { id: 1, sourceName: 'Restaurant Sales', amount: 45000, date: '2025-11-01', category: 'Sales', paymentMethod: 'Cash', status: 'Received', note: 'Daily sales' },
+        { id: 2, sourceName: 'Catering Service', amount: 15000, date: '2025-11-05', category: 'Services', paymentMethod: 'Bank Transfer', status: 'Received', note: 'Wedding catering' },
+        { id: 3, sourceName: 'Online Orders', amount: 8500, date: '2025-11-10', category: 'Sales', paymentMethod: 'Google Pay', status: 'Pending', note: '' },
+        { id: 4, sourceName: 'Delivery Commission', amount: 2500, date: '2025-11-15', category: 'Commission', paymentMethod: 'PhonePe', status: 'Received', note: 'Zomato/Swiggy' },
+        { id: 5, sourceName: 'Party Booking', amount: 12000, date: '2025-11-20', category: 'Services', paymentMethod: 'Card', status: 'Pending', note: 'Birthday party' },
     ]);
 
     // Stats
-    const totalCategories = categories.length;
-    const activeCategories = categories.filter(c => c.status === 'Active').length;
-    const deactiveCategories = categories.filter(c => c.status === 'Deactive').length;
+    const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
+    const receivedIncome = incomes.filter(i => i.status === 'Received').reduce((sum, i) => sum + i.amount, 0);
+    const pendingIncome = incomes.filter(i => i.status === 'Pending').reduce((sum, i) => sum + i.amount, 0);
 
     // Filter Logic
-    const filteredCategories = categories.filter(category => {
-        const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            category.description.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = statusFilter === 'All' || category.status === statusFilter;
+    const filteredIncomes = incomes.filter(income => {
+        const matchesSearch = income.sourceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            income.category.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === 'All' || income.status === statusFilter;
         return matchesSearch && matchesStatus;
     });
 
-    const handleEdit = (category) => {
-        setSelectedCategory(category);
+    const handleEdit = (income) => {
+        setSelectedIncome(income);
         setIsEditModalOpen(true);
     };
 
     const handleDelete = async (id) => {
         const result = await SwalConfig.confirmDelete(
-            'Delete Category?',
-            'Are you sure you want to delete this category? This action cannot be undone.'
+            'Delete Income?',
+            'Are you sure you want to delete this income record? This action cannot be undone.'
         );
 
         if (result.isConfirmed) {
-            setCategories(categories.filter(c => c.id !== id));
-            showToast.success('Category has been deleted successfully.');
+            setIncomes(incomes.filter(i => i.id !== id));
+            showToast.success('Income has been deleted successfully.');
         }
     };
 
     const columns = [
-        { header: 'Category Name', key: 'name' },
+        { header: 'Source Name', key: 'sourceName' },
         {
-            header: 'Type',
-            key: 'type',
-            render: (value) => (
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${value === 'Menu' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
-                        value === 'Expenses' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
-                            value === 'Income' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-                                'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-                    }`}>
-                    {value}
-                </span>
-            )
+            header: 'Amount',
+            key: 'amount',
+            render: (value) => <span className="font-semibold text-green-600 dark:text-green-400">₹{value.toLocaleString()}</span>
         },
-        { header: 'Description', key: 'description' },
+        { header: 'Date', key: 'date' },
+        { header: 'Category', key: 'category' },
+        { header: 'Payment Method', key: 'paymentMethod' },
         {
             header: 'Status',
             key: 'status',
             render: (value) => (
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${value === 'Active'
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${value === 'Received'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                        : value === 'Pending'
+                            ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                     }`}>
                     {value}
                 </span>
@@ -128,25 +124,25 @@ const CategoriesIndex = () => {
             {/* Header & Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <StatsCard
-                    title="Total Categories"
-                    value={totalCategories}
-                    color="blue"
+                    title="Total Income"
+                    value={`₹${totalIncome.toLocaleString()}`}
+                    color="green"
                     loading={loading}
-                    icon={<HiCollection />}
+                    icon={<HiCurrencyDollar />}
                 />
 
                 <StatsCard
-                    title="Active Categories"
-                    value={activeCategories}
-                    color="green"
+                    title="Received"
+                    value={`₹${receivedIncome.toLocaleString()}`}
+                    color="blue"
                     loading={loading}
                     icon={<HiCheckCircle />}
                 />
 
                 <StatsCard
-                    title="Deactive Categories"
-                    value={deactiveCategories}
-                    color="red"
+                    title="Pending"
+                    value={`₹${pendingIncome.toLocaleString()}`}
+                    color="orange"
                     loading={loading}
                     icon={<HiXCircle />}
                 />
@@ -160,7 +156,7 @@ const CategoriesIndex = () => {
                             <UniversalInput
                                 type="text"
                                 loading={loading}
-                                placeholder="Search Category..."
+                                placeholder="Search Income..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="mb-0"
@@ -173,27 +169,28 @@ const CategoriesIndex = () => {
                             onChange={(e) => setStatusFilter(e.target.value)}
                             options={[
                                 { value: 'All', label: 'All Status' },
-                                { value: 'Active', label: 'Active' },
-                                { value: 'Deactive', label: 'Deactive' }
+                                { value: 'Received', label: 'Received' },
+                                { value: 'Pending', label: 'Pending' },
+                                { value: 'Cancelled', label: 'Cancelled' }
                             ]}
                             className="mb-0 w-full md:w-auto min-w-[150px]"
                         />
                     </div>
                     <UniversalButton
                         onClick={() => setIsCreateModalOpen(true)}
-                        color="blue"
+                        color="green"
                         loading={loading}
                         icon={<HiPlus />}
                         className="w-full md:w-auto"
                     >
-                        Add Category
+                        Add Income
                     </UniversalButton>
                 </div>
 
                 {/* Table */}
                 <Table
                     columns={columns}
-                    data={filteredCategories}
+                    data={filteredIncomes}
                     loading={loading}
                     actions={actions}
                 />
@@ -201,20 +198,20 @@ const CategoriesIndex = () => {
 
             {/* Modals */}
             {isCreateModalOpen && (
-                <CategorieCreateModal
+                <IncomeCreateModal
                     isOpen={isCreateModalOpen}
                     onClose={() => setIsCreateModalOpen(false)}
                 />
             )}
 
-            {isEditModalOpen && selectedCategory && (
-                <CategorieEditModal
+            {isEditModalOpen && selectedIncome && (
+                <IncomeEditModal
                     isOpen={isEditModalOpen}
                     onClose={() => {
                         setIsEditModalOpen(false);
-                        setSelectedCategory(null);
+                        setSelectedIncome(null);
                     }}
-                    category={selectedCategory}
+                    income={selectedIncome}
                 />
             )}
 
@@ -222,4 +219,4 @@ const CategoriesIndex = () => {
     );
 };
 
-export default CategoriesIndex;
+export default IncomeIndex;

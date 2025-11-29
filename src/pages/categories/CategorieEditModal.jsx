@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { HiX, HiSave, HiBan } from 'react-icons/hi';
 import UniversalInput from '../../components/UniversalInput';
 import UniversalTextarea from '../../components/UniversalTextarea';
+import UniversalSelect from '../../components/UniversalSelect';
 import UniversalButton from '../../components/UniversalButton';
 
 import showToast from '../../utils/toast';
@@ -9,6 +10,7 @@ import showToast from '../../utils/toast';
 const CategorieEditModal = ({ isOpen, onClose, category }) => {
     const [formData, setFormData] = useState({
         name: category?.name || '',
+        type: category?.type || 'Menu',
         description: category?.description || '',
         status: category?.status || 'Active'
     });
@@ -66,6 +68,21 @@ const CategorieEditModal = ({ isOpen, onClose, category }) => {
                         onChange={handleChange}
                         error={errors.name}
                         placeholder="Enter category name"
+                        required
+                    />
+
+                    <UniversalSelect
+                        label="Category Type"
+                        id="type"
+                        name="type"
+                        value={formData.type}
+                        onChange={handleChange}
+                        options={[
+                            { value: 'Menu', label: 'Menu' },
+                            { value: 'Expenses', label: 'Expenses' },
+                            { value: 'Income', label: 'Income' },
+                            { value: 'Salary', label: 'Salary' }
+                        ]}
                         required
                     />
 

@@ -84,7 +84,7 @@ const TitleBar = () => {
             name: 'Finance',
             submenu: [
                 { name: 'Income', path: '/income' },
-                { name: 'Expenses', path: '/expense' },
+                { name: 'Expenses', path: '/expenses' },
                 { name: 'Salary', path: '/salary' }
             ]
         },
