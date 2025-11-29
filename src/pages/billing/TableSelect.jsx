@@ -5,7 +5,6 @@ import UniversalButton from '../../components/UniversalButton';
 import UniversalInput from '../../components/UniversalInput';
 
 // --- TableSelect Component ---
-
 const TableSelect = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -191,13 +190,13 @@ const TableSelect = () => {
                             onClick={() => handleTableSelect(table)}
                             className={`
                                 group relative overflow-hidden rounded-2xl p-5 cursor-pointer transition-all duration-300
-                                bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700
+                                backdrop-blur-sm border-2
                                 hover:-translate-y-1 hover:shadow-2xl
                                 ${table.status === 'Occupied'
-                                    ? 'shadow-red-100 dark:shadow-red-900/20'
+                                    ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 shadow-red-100 dark:shadow-red-900/20'
                                     : table.status === 'Reserved'
-                                        ? 'shadow-yellow-100 dark:shadow-yellow-900/20'
-                                        : 'shadow-green-100 dark:shadow-green-900/20'}
+                                        ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 shadow-yellow-100 dark:shadow-yellow-900/20'
+                                        : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 shadow-green-100 dark:shadow-green-900/20'}
                             `}
                             style={{ animationDelay: `${index * 50}ms` }}
                         >
