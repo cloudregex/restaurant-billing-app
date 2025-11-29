@@ -16,7 +16,9 @@ const BillingCreate = () => {
     const [selectedCustomerId, setSelectedCustomerId] = useState('walk-in');
     const [showCustomerModal, setShowCustomerModal] = useState(false);
     const [showSplitBill, setShowSplitBill] = useState(false);
-    const [splitCount, setSplitCount] = useState(2);
+    const [cashAmount, setCashAmount] = useState(0);
+    const [onlineAmount, setOnlineAmount] = useState(0);
+    const [paymentMethod, setPaymentMethod] = useState('Google Pay');
     const [showPrintModal, setShowPrintModal] = useState(false);
 
     // Dummy customer data
@@ -27,6 +29,15 @@ const BillingCreate = () => {
         { id: '3', name: 'Amit Patel', mobile: '7654321098', address: '88, Shivaji Nagar, Pune' },
     ];
 
+    // Dummy table data
+    const tables = [
+        { id: 'T1', name: 'Table 1', status: 'Available' },
+        { id: 'T2', name: 'Table 2', status: 'Occupied' },
+        { id: 'T3', name: 'Table 3', status: 'Reserved' },
+        { id: 'T4', name: 'Table 4', status: 'Available' },
+        { id: 'T5', name: 'Table 5', status: 'Occupied' },
+    ];
+
     const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
 
     // Simulate loading
@@ -35,7 +46,7 @@ const BillingCreate = () => {
             setLoading(false);
         }, 800);
         return () => clearTimeout(timer);
-    }, []);
+    }, [tableNumber]);
 
     const categories = ['All', 'Starters', 'Main Course', 'Desserts', 'Beverages'];
 
@@ -84,7 +95,56 @@ const BillingCreate = () => {
     const subtotal = billItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const tax = subtotal * 0.05;
     const total = subtotal + tax;
-    const splitAmount = total / splitCount;
+
+    // Initialize/Update split amounts when total changes
+    React.useEffect(() => {
+        if (!showSplitBill) {
+            setCashAmount(total);
+            setOnlineAmount(0);
+        } else {
+            // If split is active and total changes (e.g. item added), 
+            // adjust Cash to absorb the difference, keeping Online constant (unless > total)
+            const currentOnline = Number(onlineAmount) || 0;
+            if (currentOnline > total) {
+                setOnlineAmount(total);
+                setCashAmount(0);
+            } else {
+                setCashAmount(total - currentOnline);
+            }
+        }
+    }, [total, showSplitBill]);
+
+    const handleCashChange = (e) => {
+        const inputValue = e.target.value;
+
+        if (inputValue === '') {
+            setCashAmount('');
+            setOnlineAmount(total);
+            return;
+        }
+
+        const val = parseFloat(inputValue);
+        if (!isNaN(val) && val >= 0 && val <= total) {
+            setCashAmount(val);
+            setOnlineAmount(total - val);
+        }
+    };
+
+    const handleOnlineChange = (e) => {
+        const inputValue = e.target.value;
+
+        if (inputValue === '') {
+            setOnlineAmount('');
+            setCashAmount(total);
+            return;
+        }
+
+        const val = parseFloat(inputValue);
+        if (!isNaN(val) && val >= 0 && val <= total) {
+            setOnlineAmount(val);
+            setCashAmount(total - val);
+        }
+    };
 
     const handleSave = () => {
         console.log('Saving bill:', {
@@ -93,7 +153,16 @@ const BillingCreate = () => {
             billItems,
             subtotal,
             tax,
-            total
+            total,
+            paymentDetails: showSplitBill ? {
+                type: 'Split',
+                cash: Number(cashAmount) || 0,
+                online: Number(onlineAmount) || 0,
+                onlineMethod: paymentMethod
+            } : {
+                type: 'Full', // Assuming full cash or online based on other logic, but for now defaulting to total
+                amount: total
+            }
         });
         showToast.success('Bill saved successfully!');
         navigate('/billing/table-select');
@@ -106,7 +175,16 @@ const BillingCreate = () => {
             billItems,
             subtotal,
             tax,
-            total
+            total,
+            paymentDetails: showSplitBill ? {
+                type: 'Split',
+                cash: Number(cashAmount) || 0,
+                online: Number(onlineAmount) || 0,
+                onlineMethod: paymentMethod
+            } : {
+                type: 'Full',
+                amount: total
+            }
         });
         setShowPrintModal(true);
     };
@@ -121,81 +199,39 @@ const BillingCreate = () => {
         return (
             <div className="h-[calc(100vh-40px)] bg-gray-50 dark:bg-gray-900 flex overflow-hidden">
                 {/* Left: Categories Skeleton */}
-                <div className="w-48 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                        <div className="h-9 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse mb-2"></div>
-                        <div className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse">
-                            <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded mb-2 animate-pulse"></div>
-                            <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded animate-pulse"></div>
-                        </div>
+                <div className="w-56 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-10 shadow-lg">
+                    <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                        <div className="h-9 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse mb-4"></div>
+                        <div className="h-16 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"></div>
                     </div>
-                    <div className="flex-1 overflow-y-auto p-2">
+                    <div className="flex-1 overflow-y-auto p-3 space-y-2">
                         {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2 animate-pulse"></div>
+                            <div key={i} className="h-12 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"></div>
                         ))}
                     </div>
                 </div>
 
                 {/* Middle: Products Skeleton */}
                 <div className="flex-1 overflow-y-auto p-6">
-                    <div className="mb-4">
-                        <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
-                        <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    <div className="mb-4 flex justify-between">
+                        <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                            <div key={i} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg">
-                                <div className="h-32 bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
-                                <div className="p-3">
-                                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
-                                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
-                                    <div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                                </div>
-                            </div>
+                            <div key={i} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg h-48 animate-pulse"></div>
                         ))}
                     </div>
                 </div>
 
                 {/* Right: Bill Skeleton */}
                 <div className="w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col">
-                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                        <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1"></div>
-                        <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
-
-                        <div className="space-y-3">
-                            <div className="flex gap-2">
-                                <div className="flex-1 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
-                                <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
-                            </div>
-                        </div>
+                    <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+                        <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
+                        <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
                     </div>
-
-                    <div className="flex-1 overflow-y-auto p-4">
-                        <div className="text-center mt-8">
-                            <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-2 animate-pulse"></div>
-                            <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded mx-auto mb-2 animate-pulse"></div>
-                            <div className="h-3 w-40 bg-gray-200 dark:bg-gray-700 rounded mx-auto animate-pulse"></div>
-                        </div>
-                    </div>
-
-                    <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
-                        <div className="flex justify-between">
-                            <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                            <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                        </div>
-                        <div className="flex justify-between">
-                            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                            <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                        </div>
-                        <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-3">
-                            <div className="h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                            <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                        </div>
-
-                        <div className="flex gap-2 pt-2">
-                            <div className="flex-1 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
-                            <div className="flex-1 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
-                        </div>
+                    <div className="flex-1 p-3">
+                        <div className="h-full bg-gray-100 dark:bg-gray-800/50 rounded animate-pulse"></div>
                     </div>
                 </div>
             </div>
@@ -203,36 +239,76 @@ const BillingCreate = () => {
     }
 
     return (
-        <div className="h-[calc(100vh-40px)] bg-gray-50 dark:bg-gray-900 flex overflow-hidden">
+        <div className="h-[calc(100vh-40px)] bg-gray-50 dark:bg-gray-900 flex">
             {/* Left: Categories */}
-            <div className="w-48 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <UniversalButton
-                        onClick={() => navigate('/billing/table-select')}
-                        color="gray"
-                        variant="outlined"
-                        icon={<HiArrowLeft />}
-                        size="sm"
-                        className="w-full mb-2"
-                    >
-                        Back
-                    </UniversalButton>
-                    <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                        <p className="text-xs text-gray-600 dark:text-gray-400">Table</p>
-                        <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{tableNumber}</p>
+            <div className="w-56 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-10 shadow-lg">
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 relative overflow-hidden">
+                    {/* Decorative background elements */}
+                    <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
+                    <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-20 h-20 bg-purple-500/10 rounded-full blur-xl"></div>
+
+                    <div className="relative z-10">
+                        <div className="flex items-center justify-between mb-4">
+                            <UniversalButton
+                                onClick={() => navigate('/billing/table-select')}
+                                color="gray"
+                                variant="ghost"
+                                icon={<HiArrowLeft className="w-5 h-5" />}
+                                size="sm"
+                                className="!p-2 hover:bg-white/50 dark:hover:bg-black/20 rounded-full transition-all duration-300 hover:scale-110 hover:shadow-sm"
+                                title="Back to Tables"
+                            />
+                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Billing</span>
+                        </div>
+
+                        <div className="space-y-3">
+                            {/* Active Table Card */}
+                            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                                <div className="px-3 py-2 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-b border-blue-200 dark:border-blue-800">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                        <span className="text-xs font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wide">Active Table</span>
+                                    </div>
+                                </div>
+                                <div className="p-3">
+                                    <UniversalSelect
+                                        value={tableNumber}
+                                        onChange={(e) => navigate(`/billing/create/${e.target.value}`)}
+                                        options={tables.map(t => {
+                                            const statusIcon = t.status === 'Available' ? '🟢' : t.status === 'Occupied' ? '🔴' : '🟡';
+                                            return {
+                                                value: t.id,
+                                                label: `${t.name} ${statusIcon}`
+                                            };
+                                        })}
+                                        placeholder="Select Table"
+                                        className="z-20"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-2">
+
+                <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
+                    <p className="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Menu Categories</p>
                     {categories.map(category => (
                         <button
                             key={category}
                             onClick={() => setSelectedCategory(category)}
-                            className={`w-full text-left px-4 py-3 rounded-lg mb-2 transition-colors font-medium ${selectedCategory === category
-                                ? 'bg-blue-500 text-white shadow-lg'
-                                : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-200 group relative overflow-hidden ${selectedCategory === category
+                                ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md transform scale-[1.02]'
+                                : 'hover:bg-gray-100 dark:hover:bg-gray-700/50 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                                 }`}
                         >
-                            {category}
+                            <div className="relative z-10 flex items-center justify-between">
+                                <span className={`font-medium ${selectedCategory === category ? 'text-white' : ''}`}>
+                                    {category}
+                                </span>
+                                {selectedCategory === category && (
+                                    <div className="h-2 w-2 bg-white rounded-full shadow-[0_0_8px_rgba(255,255,255,0.8)]"></div>
+                                )}
+                            </div>
                         </button>
                     ))}
                 </div>
@@ -240,11 +316,17 @@ const BillingCreate = () => {
 
             {/* Middle: Products */}
             <div className="flex-1 overflow-y-auto p-6">
-                <div className="mb-4">
-                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                        {selectedCategory}
-                    </h2>
-                    <p className="text-gray-600 dark:text-gray-400">Click on items to add to bill</p>
+                <div className="mb-4 flex justify-between items-center">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                            {selectedCategory}
+                        </h2>
+                        <p className="text-gray-600 dark:text-gray-400">Click on items to add to bill</p>
+                    </div>
+                    <div className="bg-blue-100 dark:bg-blue-900/30 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <span className="text-sm text-blue-800 dark:text-blue-300 font-medium">Current Bill: </span>
+                        <span className="text-lg font-bold text-blue-600 dark:text-blue-400">{tableNumber}</span>
+                    </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {filteredProducts.map(product => (
@@ -272,11 +354,11 @@ const BillingCreate = () => {
 
             {/* Right: Bill */}
             <div className="w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col">
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                    <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-1">Current Bill :- {tableNumber}</h2>
+                <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+                    <h2 className="text-lg font-bold text-gray-800 dark:text-white mb-2">Current Bill :- {tableNumber}</h2>
 
                     {/* Customer Selection */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         <div className="flex gap-2">
                             <div className="flex-1">
                                 <UniversalSelect
@@ -284,31 +366,33 @@ const BillingCreate = () => {
                                     onChange={(e) => setSelectedCustomerId(e.target.value)}
                                     options={customers.map(c => ({ value: c.id, label: c.name }))}
                                     className="mb-0"
+                                    size="sm"
                                 />
                             </div>
                             <UniversalButton
                                 color="blue"
                                 variant="outlined"
-                                icon={<HiUserAdd className="w-5 h-5" />}
+                                icon={<HiUserAdd className="w-4 h-4" />}
                                 iconOnly
                                 onClick={() => setShowCustomerModal(true)}
                                 title="Add New Customer"
+                                size="sm"
                             />
                         </div>
 
                         {/* Customer Details Display */}
                         {selectedCustomer && selectedCustomer.id !== 'walk-in' && (
-                            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 space-y-2">
+                            <div className="bg-blue-50 dark:bg-blue-900/20 rounded p-2 space-y-1">
                                 {selectedCustomer.mobile && (
                                     <div className="flex items-center gap-2">
-                                        <span className="text-xs text-gray-600 dark:text-gray-400">Mobile:</span>
-                                        <span className="text-sm font-medium text-gray-800 dark:text-white">{selectedCustomer.mobile}</span>
+                                        <span className="text-[10px] text-gray-600 dark:text-gray-400">Mobile:</span>
+                                        <span className="text-xs font-medium text-gray-800 dark:text-white">{selectedCustomer.mobile}</span>
                                     </div>
                                 )}
                                 {selectedCustomer.address && (
                                     <div className="flex items-start gap-2">
-                                        <span className="text-xs text-gray-600 dark:text-gray-400">Address:</span>
-                                        <span className="text-sm font-medium text-gray-800 dark:text-white">{selectedCustomer.address}</span>
+                                        <span className="text-[10px] text-gray-600 dark:text-gray-400">Address:</span>
+                                        <span className="text-xs font-medium text-gray-800 dark:text-white">{selectedCustomer.address}</span>
                                     </div>
                                 )}
                             </div>
@@ -316,46 +400,45 @@ const BillingCreate = () => {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4">
+                <div className="flex-1 overflow-y-auto p-3">
                     {billItems.length === 0 ? (
                         <div className="text-center text-gray-500 dark:text-gray-400 mt-8">
-                            <p className="text-4xl mb-2">🛒</p>
-                            <p>No items added</p>
-                            <p className="text-sm">Click on items to add</p>
+                            <p className="text-3xl mb-2">🛒</p>
+                            <p className="text-sm">No items added</p>
                         </div>
                     ) : (
                         <div className="space-y-2">
                             {billItems.map(item => (
-                                <div key={item.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                                    <div className="flex justify-between items-start mb-2">
+                                <div key={item.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-2">
+                                    <div className="flex justify-between items-start mb-1">
                                         <div className="flex-1">
                                             <h4 className="font-medium text-gray-800 dark:text-white text-sm">{item.name}</h4>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">₹{item.price} each</p>
+                                            <p className="text-[10px] text-gray-500 dark:text-gray-400">₹{item.price} each</p>
                                         </div>
                                         <button
                                             onClick={() => handleRemoveFromBill(item.id)}
-                                            className="text-red-500 hover:text-red-700 p-1"
+                                            className="text-red-500 hover:text-red-700 p-0.5"
                                         >
-                                            <HiX className="w-5 h-5" />
+                                            <HiX className="w-4 h-4" />
                                         </button>
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <button
                                                 onClick={() => handleQuantityChange(item.id, -1)}
-                                                className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500 font-bold"
+                                                className="w-6 h-6 bg-gray-200 dark:bg-gray-600 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500 font-bold flex items-center justify-center"
                                             >
                                                 -
                                             </button>
-                                            <span className="w-10 text-center font-bold text-gray-800 dark:text-white">{item.quantity}</span>
+                                            <span className="w-8 text-center font-bold text-gray-800 dark:text-white text-sm">{item.quantity}</span>
                                             <button
                                                 onClick={() => handleQuantityChange(item.id, 1)}
-                                                className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500 font-bold"
+                                                className="w-6 h-6 bg-gray-200 dark:bg-gray-600 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-500 font-bold flex items-center justify-center"
                                             >
                                                 +
                                             </button>
                                         </div>
-                                        <span className="font-bold text-gray-800 dark:text-white">₹{item.price * item.quantity}</span>
+                                        <span className="font-bold text-gray-800 dark:text-white text-sm">₹{item.price * item.quantity}</span>
                                     </div>
                                 </div>
                             ))}
@@ -363,70 +446,85 @@ const BillingCreate = () => {
                     )}
                 </div>
 
-                <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
-                    <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                <div className="p-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
+                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                         <span>Subtotal</span>
                         <span className="font-medium">₹{subtotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                         <span>Tax (5%)</span>
                         <span className="font-medium">₹{tax.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-2xl font-bold text-gray-800 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-3">
-                        <span>Total</span>
-                        <span className="text-green-600 dark:text-green-400">₹{total.toFixed(2)}</span>
-                    </div>
 
-                    {/* Split Bill Section */}
-                    <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+                    {/* Split Bill Section - Moved Above Total */}
+                    <div className="border-t border-gray-200 dark:border-gray-700 pt-2">
                         <button
                             onClick={() => setShowSplitBill(!showSplitBill)}
-                            className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium mb-2"
+                            className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline text-xs font-medium mb-1"
                         >
-                            <HiUserGroup className="w-4 h-4" />
-                            {showSplitBill ? 'Hide' : 'Show'} Split Bill
+                            <HiUserGroup className="w-3 h-3" />
+                            {showSplitBill ? 'Hide' : 'Show'} Split Payment
                         </button>
 
                         {showSplitBill && (
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Split between:</span>
-                                    <div className="flex items-center gap-2">
-                                        {[2, 3, 4, 5].map(num => (
-                                            <button
-                                                key={num}
-                                                onClick={() => setSplitCount(num)}
-                                                className={`w-8 h-8 rounded-lg font-bold transition-colors ${splitCount === num
-                                                    ? 'bg-blue-500 text-white'
-                                                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                                                    }`}
-                                            >
-                                                {num}
-                                            </button>
-                                        ))}
+                            <div className="space-y-2 bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg mb-2">
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-medium text-gray-600 dark:text-gray-400">Cash</label>
+                                        <input
+                                            type="number"
+                                            value={cashAmount}
+                                            onChange={handleCashChange}
+                                            className="w-full px-2 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none no-spinner"
+                                            placeholder="0"
+                                        />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-medium text-gray-600 dark:text-gray-400">Online</label>
+                                        <input
+                                            type="number"
+                                            value={onlineAmount}
+                                            onChange={handleOnlineChange}
+                                            className="w-full px-2 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none no-spinner"
+                                            placeholder="0"
+                                        />
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-2">
-                                    {Array.from({ length: splitCount }).map((_, index) => (
-                                        <div key={index} className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 text-center">
-                                            <p className="text-xs text-gray-600 dark:text-gray-400">Person {index + 1}</p>
-                                            <p className="text-lg font-bold text-blue-600 dark:text-blue-400">₹{splitAmount.toFixed(2)}</p>
-                                        </div>
-                                    ))}
-                                </div>
+                                {onlineAmount > 0 && (
+                                    <div className="space-y-1">
+                                        <label className="text-[10px] font-medium text-gray-600 dark:text-gray-400">Method</label>
+                                        <select
+                                            value={paymentMethod}
+                                            onChange={(e) => setPaymentMethod(e.target.value)}
+                                            className="w-full px-2 py-1 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none"
+                                        >
+                                            <option value="Google Pay">Google Pay</option>
+                                            <option value="PhonePe">PhonePe</option>
+                                            <option value="Paytm">Paytm</option>
+                                            <option value="Card">Card</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
 
+                    <div className="flex justify-between text-xl font-bold text-gray-800 dark:text-white border-t border-gray-200 dark:border-gray-700 pt-2">
+                        <span>Total</span>
+                        <span className="text-green-600 dark:text-green-400">₹{total.toFixed(2)}</span>
+                    </div>
+
                     {/* Action Buttons */}
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex gap-2 pt-1">
                         <UniversalButton
                             color="blue"
                             className="flex-1"
                             disabled={billItems.length === 0}
                             onClick={handleSave}
-                            icon={<HiSave className="w-5 h-5" />}
+                            icon={<HiSave className="w-4 h-4" />}
+                            size="sm"
                         >
                             Save
                         </UniversalButton>
@@ -435,36 +533,47 @@ const BillingCreate = () => {
                             className="flex-1"
                             disabled={billItems.length === 0}
                             onClick={handleSaveAndComplete}
-                            icon={<HiCheckCircle className="w-5 h-5" />}
+                            icon={<HiCheckCircle className="w-4 h-4" />}
+                            size="sm"
                         >
-                            Save & Complete
+                            Complete
                         </UniversalButton>
                     </div>
                 </div>
             </div>
 
-            {/* Customer Create Modal */}
+            {/* Modals */}
             <CustomerCreateModal
                 isOpen={showCustomerModal}
                 onClose={() => setShowCustomerModal(false)}
+                onSuccess={(newCustomer) => {
+                    // In a real app, you'd add the new customer to the list and select them
+                    console.log('New customer created:', newCustomer);
+                    setShowCustomerModal(false);
+                    showToast.success('Customer created successfully!');
+                }}
             />
 
-            {/* Print Bill Modal */}
             <PrintBillModal
                 isOpen={showPrintModal}
                 onClose={handleClosePrintModal}
                 billData={{
                     tableNumber,
-                    customerName: selectedCustomer?.name || 'Walk-in',
-                    customerMobile: selectedCustomer?.mobile || '',
-                    customerAddress: selectedCustomer?.address || '',
-                    billItems,
+                    customer: selectedCustomer,
+                    items: billItems,
                     subtotal,
                     tax,
                     total,
-                    billNumber: `BILL-${Date.now()}`,
-                    date: new Date().toLocaleDateString(),
-                    time: new Date().toLocaleTimeString()
+                    date: new Date().toLocaleString(),
+                    paymentDetails: showSplitBill ? {
+                        type: 'Split',
+                        cash: Number(cashAmount) || 0,
+                        online: Number(onlineAmount) || 0,
+                        onlineMethod: paymentMethod
+                    } : {
+                        type: 'Full',
+                        amount: total
+                    }
                 }}
             />
         </div>

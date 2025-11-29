@@ -29,6 +29,17 @@ body {
   .animate-scale-in {
     animation: scale-in 0.2s ease-out;
   }
+  
+  /* Hide number input arrows */
+  .no-spinner::-webkit-inner-spin-button,
+  .no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  .no-spinner {
+    -moz-appearance: textfield;
+  }
 }
 
 /* Shimmer Animation for Skeletons */
