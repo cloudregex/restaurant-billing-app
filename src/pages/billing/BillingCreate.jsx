@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { HiArrowLeft, HiX, HiUserAdd, HiUserGroup, HiSave, HiCheckCircle } from 'react-icons/hi';
+import { HiArrowLeft, HiX, HiUserAdd, HiUserGroup, HiSave, HiCheckCircle, HiSearch } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
 import UniversalButton from '../../components/UniversalButton';
 import UniversalSelect from '../../components/UniversalSelect';
+import UniversalInput from '../../components/UniversalInput';
 import PrintBillModal from '../../components/PrintBillModal';
 import CustomerCreateModal from '../customer/CustomerCreateModal';
 import showToast from '../../utils/toast';
@@ -18,8 +19,10 @@ const BillingCreate = () => {
     const [showSplitBill, setShowSplitBill] = useState(false);
     const [cashAmount, setCashAmount] = useState(0);
     const [onlineAmount, setOnlineAmount] = useState(0);
+    const [productSearchTerm, setProductSearchTerm] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('Google Pay');
     const [showPrintModal, setShowPrintModal] = useState(false);
+    const [billSearchTerm, setBillSearchTerm] = useState('');
 
     // Dummy customer data
     const customers = [
@@ -61,9 +64,12 @@ const BillingCreate = () => {
         { id: 8, name: 'Dal Tadka', marathiName: 'डाळ तडका', category: 'Main Course', price: 180, image: '' },
     ];
 
-    const filteredProducts = selectedCategory === 'All'
-        ? products
-        : products.filter(p => p.category === selectedCategory);
+    const filteredProducts = products.filter(p => {
+        const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
+        const matchesSearch = p.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
+            p.marathiName.toLowerCase().includes(productSearchTerm.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
 
     const handleAddToBill = (product) => {
         const existingItem = billItems.find(item => item.id === product.id);
@@ -242,7 +248,7 @@ const BillingCreate = () => {
         <div className="h-[calc(100vh-40px)] bg-gray-50 dark:bg-gray-900 flex">
             {/* Left: Categories */}
             <div className="w-56 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col z-10 shadow-lg">
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 relative overflow-hidden">
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 relative">
                     {/* Decorative background elements */}
                     <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
                     <div className="absolute bottom-0 left-0 -mb-4 -ml-4 w-20 h-20 bg-purple-500/10 rounded-full blur-xl"></div>
@@ -290,7 +296,7 @@ const BillingCreate = () => {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-3 space-y-2 custom-scrollbar z-0">
                     <p className="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Menu Categories</p>
                     {categories.map(category => (
                         <button
@@ -323,11 +329,23 @@ const BillingCreate = () => {
                         </h2>
                         <p className="text-gray-600 dark:text-gray-400">Click on items to add to bill</p>
                     </div>
-                    <div className="bg-blue-100 dark:bg-blue-900/30 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-800">
-                        <span className="text-sm text-blue-800 dark:text-blue-300 font-medium">Current Bill: </span>
-                        <span className="text-lg font-bold text-blue-600 dark:text-blue-400">{tableNumber}</span>
+                    <div className='flex items-center gap-4'>
+                        <div className="w-64">
+                            <UniversalInput
+                                value={productSearchTerm}
+                                onChange={(e) => setProductSearchTerm(e.target.value)}
+                                placeholder="Search products..."
+                                leftIcon={<HiSearch className="w-5 h-5 text-gray-400" />}
+                                className="mb-0"
+                            />
+                        </div>
+                        <div className="bg-blue-100 dark:bg-blue-900/30 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-800 whitespace-nowrap">
+                            <span className="text-sm text-blue-800 dark:text-blue-300 font-medium">Current Bill: </span>
+                            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">{tableNumber}</span>
+                        </div>
                     </div>
                 </div>
+
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {filteredProducts.map(product => (
                         <div
@@ -354,11 +372,9 @@ const BillingCreate = () => {
 
             {/* Right: Bill */}
             <div className="w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col">
-                <div className="p-3 border-b border-gray-200 dark:border-gray-700">
-                    <h2 className="text-lg font-bold text-gray-800 dark:text-white mb-2">Current Bill :- {tableNumber}</h2>
-
+                <div className="p-2 border-b border-gray-200 dark:border-gray-700">
                     {/* Customer Selection */}
-                    <div className="space-y-2">
+                    <div className="space-y-2 mb-1">
                         <div className="flex gap-2">
                             <div className="flex-1">
                                 <UniversalSelect
@@ -398,7 +414,23 @@ const BillingCreate = () => {
                             </div>
                         )}
                     </div>
+
+                    <div className="flex justify-between items-center gap-2 py-1">
+                        <h2 className="text-base font-bold text-gray-800 dark:text-white whitespace-nowrap flex items-center">Current Bill :- {tableNumber}</h2>
+                        <div className="w-32 relative">
+                            <input
+                                type="text"
+                                value={billSearchTerm}
+                                onChange={(e) => setBillSearchTerm(e.target.value)}
+                                placeholder="Search..."
+                                className="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500 h-7"
+                            />
+                            <HiSearch className="w-3 h-3 text-gray-400 absolute left-2 top-2" />
+                        </div>
+                    </div>
                 </div>
+
+
 
                 <div className="flex-1 overflow-y-auto p-3">
                     {billItems.length === 0 ? (
@@ -408,7 +440,7 @@ const BillingCreate = () => {
                         </div>
                     ) : (
                         <div className="space-y-2">
-                            {billItems.map(item => (
+                            {billItems.filter(item => item.name.toLowerCase().includes(billSearchTerm.toLowerCase())).map(item => (
                                 <div key={item.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-2">
                                     <div className="flex justify-between items-start mb-1">
                                         <div className="flex-1">
