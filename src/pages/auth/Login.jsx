@@ -52,10 +52,10 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-full relative overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
+        <div className="h-full relative overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
             <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
 
-            <div className="relative z-10 min-h-full flex flex-col items-center justify-center py-40">
+            <div className="relative z-10 h-full flex flex-col items-center justify-center">
                 <div className="flex flex-col items-center">
                     <div className="mb-6">
                         <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center shadow-2xl border-4 border-white/20">
@@ -99,6 +99,10 @@ const Login = () => {
                     </form>
 
                     <div className="flex gap-6 mt-8">
+                        <Link to="/upload-backup" className="text-white/80 hover:text-white text-sm transition-colors duration-200">
+                            Upload Backup
+                        </Link>
+                        <span className="text-white/40">|</span>
                         <Link to="/forgot-password" className="text-white/80 hover:text-white text-sm transition-colors duration-200">
                             I forgot my PIN
                         </Link>
@@ -106,6 +110,7 @@ const Login = () => {
                         <Link to="/register" className="text-white/80 hover:text-white text-sm transition-colors duration-200">
                             Create account
                         </Link>
+
                     </div>
                 </div>
 

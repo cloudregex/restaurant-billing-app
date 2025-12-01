@@ -11,6 +11,7 @@ import OTP from './pages/auth/OTP';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 import Dashboard from './pages/Dashboard';
+import UploadBackUp from './pages/auth/UploadBackUp';
 import SupplierIndex from './pages/supplier/SupplierIndex';
 import CategoriesIndex from './pages/categories/CategoriesIndex';
 import CustomerIndex from './pages/customer/CustomerIndex';
@@ -32,7 +33,7 @@ import SalaryEdit from './pages/salary/SalaryEdit';
 
 const Layout = () => {
   const location = useLocation();
-  const isAuthPage = ['/', '/register', '/otp', '/forgot-password', '/reset-password'].includes(location.pathname);
+  const isAuthPage = ['/', '/register', '/otp', '/forgot-password', '/reset-password', '/upload-backup'].includes(location.pathname);
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-gray-900 flex flex-col">
@@ -44,6 +45,7 @@ const Layout = () => {
           <Route path="/otp" element={<OTP />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/upload-backup" element={<UploadBackUp />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/supplier" element={<SupplierIndex />} />
           <Route path="/category" element={<CategoriesIndex />} />

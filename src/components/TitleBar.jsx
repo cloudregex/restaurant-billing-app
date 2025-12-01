@@ -69,7 +69,7 @@ const TitleBar = () => {
         };
     }, []);
 
-    const isAuthPage = ['/', '/register', '/otp', '/forgot-password', '/reset-password'].includes(location.pathname);
+    const isAuthPage = ['/', '/register', '/otp', '/forgot-password', '/reset-password', '/upload-backup'].includes(location.pathname);
 
     const menuItems = [
         { name: 'Dashboard', path: '/dashboard' },
