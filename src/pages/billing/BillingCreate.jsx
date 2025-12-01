@@ -513,7 +513,7 @@ const BillingCreate = () => {
                                         }
                                     }}
                                     onBlur={() => setShowDiscountInput(false)}
-                                    className="w-20 px-2 py-0.5 text-xs rounded border border-blue-500 dark:border-blue-400 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none"
+                                    className="w-20 px-2 py-0.5 text-xs rounded border border-blue-500 dark:border-blue-400 bg-white dark:bg-gray-800 no-spinner text-gray-800 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none"
                                     placeholder="0"
                                     autoFocus
                                 />

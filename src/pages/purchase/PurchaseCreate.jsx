@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HiX, HiPlus, HiSave, HiCheckCircle, HiUserAdd, HiUserGroup } from 'react-icons/hi';
+import { HiX, HiPlus, HiSave, HiCheckCircle, HiUserAdd, HiUserGroup, HiArrowLeft } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
 import UniversalButton from '../../components/UniversalButton';
 import UniversalSelect from '../../components/UniversalSelect';
@@ -65,6 +65,19 @@ const PurchaseCreate = () => {
         // Recalculate totals
         newItems[index] = calculateItemTotals(newItems[index]);
         setItems(newItems);
+
+        // Auto-add new row if rate is entered in the last row
+        if (field === 'rate' && value !== '' && index === items.length - 1) {
+            setItems(prevItems => [...prevItems, {
+                id: prevItems.length + 1,
+                name: '',
+                quantity: '',
+                rate: '',
+                taxRate: '0',
+                taxAmount: 0,
+                totalAmount: 0
+            }]);
+        }
     };
 
     // Add new item row
@@ -227,90 +240,25 @@ const PurchaseCreate = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Create Purchase</h1>
-                    <p className="text-gray-600 dark:text-gray-400">Add a new purchase entry</p>
+            <div className="max-w-8xl mx-auto">
+                {/* Header with Back Button */}
+                <div className="flex items-center gap-4 mb-6">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-sm hover:shadow-md transition-all text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+                    >
+                        <HiArrowLeft className="w-5 h-5" />
+                    </button>
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Create Purchase</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Create a new purchase invoice</p>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Bill Information Card */}
-                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Bill Information</h2>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Date */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Date <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={purchaseDate}
-                                        onChange={(e) => setPurchaseDate(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                                    />
-                                </div>
-
-                                {/* Reference Number */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Invoice/Reference Number
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={referenceNumber}
-                                        onChange={(e) => setReferenceNumber(e.target.value)}
-                                        placeholder="Enter reference number"
-                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                                    />
-                                </div>
-
-                                {/* Supplier Selection */}
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Supplier <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="flex gap-2">
-                                        <div className="flex-1">
-                                            <UniversalSelect
-                                                value={selectedSupplierId}
-                                                onChange={(e) => setSelectedSupplierId(e.target.value)}
-                                                options={suppliers.map(s => ({ value: s.id, label: s.name }))}
-                                                placeholder="Select supplier"
-                                            />
-                                        </div>
-                                        <UniversalButton
-                                            color="blue"
-                                            variant="outlined"
-                                            icon={<HiUserAdd className="w-4 h-4" />}
-                                            iconOnly
-                                            onClick={() => setShowSupplierModal(true)}
-                                            title="Add New Supplier"
-                                        />
-                                    </div>
-
-                                    {/* Supplier Details Display */}
-                                    {selectedSupplier && (
-                                        <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 rounded p-2 space-y-1">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xs text-gray-600 dark:text-gray-400">Mobile:</span>
-                                                <span className="text-sm font-medium text-gray-800 dark:text-white">{selectedSupplier.mobile}</span>
-                                            </div>
-                                            {selectedSupplier.gstNumber && (
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xs text-gray-600 dark:text-gray-400">GST:</span>
-                                                    <span className="text-sm font-medium text-gray-800 dark:text-white">{selectedSupplier.gstNumber}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
 
                         {/* Items Card */}
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -357,7 +305,7 @@ const PurchaseCreate = () => {
                                                         value={item.quantity}
                                                         onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                                                         placeholder="0"
-                                                        className="w-20 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                                        className="w-20 no-spinner px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                                                         min="0"
                                                         step="0.01"
                                                     />
@@ -368,7 +316,7 @@ const PurchaseCreate = () => {
                                                         value={item.rate}
                                                         onChange={(e) => handleItemChange(index, 'rate', e.target.value)}
                                                         placeholder="0.00"
-                                                        className="w-24 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                                        className="w-24 px-2 py-1 text-sm no-spinner border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                                                         min="0"
                                                         step="0.01"
                                                     />
@@ -411,7 +359,65 @@ const PurchaseCreate = () => {
                     {/* Summary Sidebar */}
                     <div className="lg:col-span-1">
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 sticky top-6">
-                            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Summary</h2>
+                            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Bill Information</h2>
+
+                            <div className="space-y-4 mb-6">
+                                {/* Date */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Date <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={purchaseDate}
+                                        onChange={(e) => setPurchaseDate(e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                    />
+                                </div>
+
+                                {/* Supplier Selection */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Supplier <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <div className="flex-1">
+                                            <UniversalSelect
+                                                value={selectedSupplierId}
+                                                onChange={(e) => setSelectedSupplierId(e.target.value)}
+                                                options={suppliers.map(s => ({ value: s.id, label: s.name }))}
+                                                placeholder="Select supplier"
+                                            />
+                                        </div>
+                                        <UniversalButton
+                                            color="blue"
+                                            variant="outlined"
+                                            icon={<HiUserAdd className="w-4 h-4" />}
+                                            iconOnly
+                                            onClick={() => setShowSupplierModal(true)}
+                                            title="Add New Supplier"
+                                        />
+                                    </div>
+
+                                    {/* Supplier Details Display */}
+                                    {selectedSupplier && (
+                                        <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 rounded p-2 space-y-1">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xs text-gray-600 dark:text-gray-400">Mobile:</span>
+                                                <span className="text-sm font-medium text-gray-800 dark:text-white">{selectedSupplier.mobile}</span>
+                                            </div>
+                                            {selectedSupplier.gstNumber && (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-gray-600 dark:text-gray-400">GST:</span>
+                                                    <span className="text-sm font-medium text-gray-800 dark:text-white">{selectedSupplier.gstNumber}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-t border-gray-200 dark:border-gray-700 pt-4">Summary</h2>
 
                             <div className="space-y-3">
                                 {/* Subtotal */}
@@ -421,11 +427,9 @@ const PurchaseCreate = () => {
                                 </div>
 
                                 {/* Discount */}
-                                <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Discount
-                                    </label>
-                                    <div className="flex gap-2 mb-2">
+                                <div className="flex justify-between align-center text-sm">
+                                    <span className="text-gray-600 dark:text-gray-400">Discount</span>
+                                    <div className="flex gap-2">
                                         <select
                                             value={discountType}
                                             onChange={(e) => setDiscountType(e.target.value)}
@@ -439,15 +443,16 @@ const PurchaseCreate = () => {
                                             value={discountValue}
                                             onChange={(e) => setDiscountValue(e.target.value)}
                                             placeholder="0"
-                                            className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                            className="flex-1 px-2 py-1 w-24 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white no-spinner"
                                             min="0"
                                             step="0.01"
                                         />
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600 dark:text-gray-400">Discount Amount</span>
-                                        <span className="font-medium text-red-600 dark:text-red-400">-₹{discountAmount.toFixed(2)}</span>
-                                    </div>
+                                </div>
+
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-gray-600 dark:text-gray-400">Discount Amount</span>
+                                    <span className="font-medium text-red-600 dark:text-red-400">-₹{discountAmount.toFixed(2)}</span>
                                 </div>
 
                                 {/* Tax Amount */}
@@ -475,7 +480,7 @@ const PurchaseCreate = () => {
                                                         type="number"
                                                         value={cashAmount}
                                                         onChange={handleCashChange}
-                                                        className="w-full px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none no-spinner"
+                                                        className="w-full no-spinner px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none no-spinner"
                                                         placeholder="0"
                                                     />
                                                 </div>
@@ -485,7 +490,7 @@ const PurchaseCreate = () => {
                                                         type="number"
                                                         value={onlineAmount}
                                                         onChange={handleOnlineChange}
-                                                        className="w-full px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none no-spinner"
+                                                        className="w-full no-spinner px-2 py-1 text-sm rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none no-spinner"
                                                         placeholder="0"
                                                     />
                                                 </div>
@@ -518,10 +523,22 @@ const PurchaseCreate = () => {
                                 </div>
 
                                 {/* Action Buttons */}
-                                <div className="flex flex-col gap-2 pt-3">
+                                <div className="flex gap-2 pt-3">
+                                    <UniversalButton
+                                        color="red"
+                                        className="flex-1"
+                                        onClick={() => {
+                                            if (window.confirm('Are you sure you want to cancel?')) {
+                                                navigate('/purchase');
+                                            }
+                                        }}
+                                        icon={<HiX className="w-4 h-4" />}
+                                    >
+                                        Cancel
+                                    </UniversalButton>
                                     <UniversalButton
                                         color="blue"
-                                        className="w-full"
+                                        className="flex-1"
                                         onClick={handleSave}
                                         icon={<HiSave className="w-4 h-4" />}
                                     >
@@ -529,19 +546,11 @@ const PurchaseCreate = () => {
                                     </UniversalButton>
                                     <UniversalButton
                                         color="green"
-                                        className="w-full"
+                                        className="flex-1"
                                         onClick={handleSaveAndComplete}
                                         icon={<HiCheckCircle className="w-4 h-4" />}
                                     >
-                                        Save & Complete
-                                    </UniversalButton>
-                                    <UniversalButton
-                                        color="gray"
-                                        variant="outlined"
-                                        className="w-full"
-                                        onClick={() => navigate('/purchase')}
-                                    >
-                                        Cancel
+                                        Print
                                     </UniversalButton>
                                 </div>
                             </div>
