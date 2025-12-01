@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { HiX, HiPlus, HiSave, HiCheckCircle, HiUserAdd, HiUserGroup, HiArrowLeft } from 'react-icons/hi';
 import { useNavigate } from 'react-router-dom';
+import { SwalConfig } from '../../components/SwalConfig';
 import UniversalButton from '../../components/UniversalButton';
 import UniversalSelect from '../../components/UniversalSelect';
 import SupplierCreateModal from '../supplier/SupplierCreateModal';
@@ -9,6 +10,15 @@ import showToast from '../../utils/toast';
 
 const PurchaseCreate = () => {
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Simulate loading
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, []);
 
     // Bill Information State
     const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
@@ -237,6 +247,10 @@ const PurchaseCreate = () => {
     };
 
     const selectedSupplier = suppliers.find(s => s.id === selectedSupplierId);
+
+    if (isLoading) {
+        return <PurchaseCreateSkeleton />;
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
@@ -527,8 +541,13 @@ const PurchaseCreate = () => {
                                     <UniversalButton
                                         color="red"
                                         className="flex-1"
-                                        onClick={() => {
-                                            if (window.confirm('Are you sure you want to cancel?')) {
+                                        onClick={async () => {
+                                            const result = await SwalConfig.confirmCancel(
+                                                'Cancel Purchase?',
+                                                'All unsaved changes will be lost.'
+                                            );
+
+                                            if (result.isConfirmed) {
                                                 navigate('/purchase');
                                             }
                                         }}
@@ -575,3 +594,130 @@ const PurchaseCreate = () => {
 };
 
 export default PurchaseCreate;
+
+const PurchaseCreateSkeleton = () => {
+    return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+            <div className="max-w-8xl mx-auto">
+                {/* Header Skeleton */}
+                <div className="flex items-center gap-4 mb-6">
+                    <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+                    <div className="space-y-2">
+                        <div className="h-6 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                        <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Main Content Skeleton */}
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Items Card Skeleton */}
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                            <div className="flex justify-between mb-6">
+                                <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                            </div>
+
+                            {/* Table Header */}
+                            <div className="flex gap-4 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">
+                                <div className="h-4 w-1/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div className="h-4 w-1/6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div className="h-4 w-1/6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div className="h-4 w-1/6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                <div className="h-4 w-1/6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                            </div>
+
+                            {/* Table Rows */}
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="flex gap-4 mb-4">
+                                    <div className="h-10 w-1/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-10 w-1/6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-10 w-1/6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-10 w-1/6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-10 w-1/6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Sidebar Skeleton */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                            {/* Bill Information Header */}
+                            <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-4 animate-pulse"></div>
+
+                            {/* Bill Information Fields */}
+                            <div className="space-y-4 mb-6">
+                                {/* Date Field */}
+                                <div className="space-y-2">
+                                    <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                </div>
+
+                                {/* Supplier Field */}
+                                <div className="space-y-2">
+                                    <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="flex gap-2">
+                                        <div className="h-10 flex-1 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                        <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Summary Header */}
+                            <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-4 border-t border-gray-200 dark:border-gray-700 pt-4 animate-pulse"></div>
+
+                            {/* Summary Items */}
+                            <div className="space-y-3">
+                                {/* Subtotal */}
+                                <div className="flex justify-between">
+                                    <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                </div>
+
+                                {/* Discount */}
+                                <div className="flex justify-between">
+                                    <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="flex gap-2">
+                                        <div className="h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                        <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    </div>
+                                </div>
+
+                                {/* Discount Amount */}
+                                <div className="flex justify-between">
+                                    <div className="h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                </div>
+
+                                {/* Tax Amount */}
+                                <div className="flex justify-between">
+                                    <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                </div>
+
+                                {/* Split Payment Section */}
+                                <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+                                    <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-2 animate-pulse"></div>
+                                </div>
+
+                                {/* Net Total */}
+                                <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-3">
+                                    <div className="h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex gap-2 pt-3">
+                                    <div className="h-10 flex-1 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-10 flex-1 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-10 flex-1 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};

@@ -46,6 +46,23 @@ export const SwalConfig = {
         });
     },
 
+    confirmCancel: (title, text) => {
+        const isDarkMode = document.documentElement.classList.contains('dark');
+
+        return MySwal.fire({
+            title: title || 'Cancel?',
+            text: text || 'All unsaved changes will be lost.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444', // red-500
+            cancelButtonColor: '#6b7280', // gray-500
+            confirmButtonText: 'Yes, Cancel',
+            cancelButtonText: 'No, Go Back',
+            background: isDarkMode ? '#1f2937' : '#ffffff',
+            color: isDarkMode ? '#f9fafb' : '#111827',
+        });
+    },
+
     success: (title, text) => {
         const isDarkMode = document.documentElement.classList.contains('dark');
 

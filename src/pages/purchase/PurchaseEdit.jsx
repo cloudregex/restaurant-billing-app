@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { HiX, HiPlus, HiSave, HiCheckCircle, HiUserAdd, HiUserGroup } from 'react-icons/hi';
+import { HiX, HiPlus, HiSave, HiCheckCircle, HiUserAdd, HiUserGroup, HiArrowLeft } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
+import { SwalConfig } from '../../components/SwalConfig';
 import UniversalButton from '../../components/UniversalButton';
 import UniversalSelect from '../../components/UniversalSelect';
 import SupplierCreateModal from '../supplier/SupplierCreateModal';
@@ -10,6 +11,15 @@ import showToast from '../../utils/toast';
 const PurchaseEdit = () => {
     const navigate = useNavigate();
     const { id } = useParams();
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Simulate loading
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsLoading(false);
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, []);
 
     // Bill Information State
     const [purchaseDate, setPurchaseDate] = useState('');
@@ -25,7 +35,9 @@ const PurchaseEdit = () => {
     ]);
 
     // Items State
-    const [items, setItems] = useState([]);
+    const [items, setItems] = useState([
+        { id: 1, name: '', quantity: '', rate: '', taxRate: '0', taxAmount: 0, totalAmount: 0 }
+    ]);
 
     // Summary State
     const [discountType, setDiscountType] = useState('percentage');
@@ -101,6 +113,19 @@ const PurchaseEdit = () => {
         // Recalculate totals
         newItems[index] = calculateItemTotals(newItems[index]);
         setItems(newItems);
+
+        // Auto-add new row if rate is entered in the last row
+        if (field === 'rate' && value !== '' && index === items.length - 1) {
+            setItems(prevItems => [...prevItems, {
+                id: prevItems.length + 1,
+                name: '',
+                quantity: '',
+                rate: '',
+                taxRate: '0',
+                taxAmount: 0,
+                totalAmount: 0
+            }]);
+        }
     };
 
     // Add new item row
@@ -263,93 +288,89 @@ const PurchaseEdit = () => {
 
     const selectedSupplier = suppliers.find(s => s.id === selectedSupplierId);
 
+    // Skeleton Loader Component
+    const PurchaseEditSkeleton = () => (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 animate-pulse">
+            <div className="max-w-8xl mx-auto">
+                {/* Header Skeleton */}
+                <div className="flex items-center gap-4 mb-6">
+                    <div className="w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
+                    <div>
+                        <div className="h-8 w-48 bg-gray-300 dark:bg-gray-700 rounded mb-2"></div>
+                        <div className="h-4 w-32 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Main Content Skeleton */}
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Items Card Skeleton */}
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="h-6 w-24 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                                <div className="h-9 w-28 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                            </div>
+                            <div className="space-y-3">
+                                {[1, 2, 3].map((i) => (
+                                    <div key={i} className="flex gap-2">
+                                        <div className="flex-1 h-8 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                                        <div className="w-20 h-8 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                                        <div className="w-24 h-8 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                                        <div className="w-28 h-8 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Sidebar Skeleton */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                            <div className="h-6 w-32 bg-gray-300 dark:bg-gray-700 rounded mb-4"></div>
+                            <div className="space-y-4">
+                                <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                                <div className="h-10 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                                <div className="h-6 w-24 bg-gray-300 dark:bg-gray-700 rounded mt-6 mb-4"></div>
+                                {[1, 2, 3, 4].map((i) => (
+                                    <div key={i} className="h-6 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                                ))}
+                                <div className="flex gap-2 pt-3">
+                                    <div className="flex-1 h-10 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                                    <div className="flex-1 h-10 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                                    <div className="flex-1 h-10 bg-gray-300 dark:bg-gray-700 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    if (isLoading) {
+        return <PurchaseEditSkeleton />;
+    }
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Edit Purchase #{id}</h1>
-                    <p className="text-gray-600 dark:text-gray-400">Update purchase details</p>
+            <div className="max-w-8xl mx-auto">
+                {/* Header with Back Button */}
+                <div className="flex items-center gap-4 mb-6">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-sm hover:shadow-md transition-all text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"
+                    >
+                        <HiArrowLeft className="w-5 h-5" />
+                    </button>
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Edit Purchase #{id}</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Update purchase details</p>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Bill Information Card */}
-                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Bill Information</h2>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Date */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Date <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={purchaseDate}
-                                        onChange={(e) => setPurchaseDate(e.target.value)}
-                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                                    />
-                                </div>
-
-                                {/* Reference Number */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Invoice/Reference Number
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={referenceNumber}
-                                        onChange={(e) => setReferenceNumber(e.target.value)}
-                                        placeholder="Enter reference number"
-                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                                    />
-                                </div>
-
-                                {/* Supplier Selection */}
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Supplier <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="flex gap-2">
-                                        <div className="flex-1">
-                                            <UniversalSelect
-                                                value={selectedSupplierId}
-                                                onChange={(e) => setSelectedSupplierId(e.target.value)}
-                                                options={suppliers.map(s => ({ value: s.id, label: s.name }))}
-                                                placeholder="Select supplier"
-                                            />
-                                        </div>
-                                        <UniversalButton
-                                            color="blue"
-                                            variant="outlined"
-                                            icon={<HiUserAdd className="w-4 h-4" />}
-                                            iconOnly
-                                            onClick={() => setShowSupplierModal(true)}
-                                            title="Add New Supplier"
-                                        />
-                                    </div>
-
-                                    {/* Supplier Details Display */}
-                                    {selectedSupplier && (
-                                        <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 rounded p-2 space-y-1">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-xs text-gray-600 dark:text-gray-400">Mobile:</span>
-                                                <span className="text-sm font-medium text-gray-800 dark:text-white">{selectedSupplier.mobile}</span>
-                                            </div>
-                                            {selectedSupplier.gstNumber && (
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xs text-gray-600 dark:text-gray-400">GST:</span>
-                                                    <span className="text-sm font-medium text-gray-800 dark:text-white">{selectedSupplier.gstNumber}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
                         {/* Items Card */}
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                             <div className="flex items-center justify-between mb-4">
@@ -449,8 +470,65 @@ const PurchaseEdit = () => {
                     {/* Summary Sidebar */}
                     <div className="lg:col-span-1">
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 sticky top-6">
-                            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Summary</h2>
+                            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">Bill Information</h2>
 
+                            <div className="space-y-4 mb-6">
+                                {/* Date */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Date <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={purchaseDate}
+                                        onChange={(e) => setPurchaseDate(e.target.value)}
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                    />
+                                </div>
+
+                                {/* Supplier Selection */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Supplier <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <div className="flex-1">
+                                            <UniversalSelect
+                                                value={selectedSupplierId}
+                                                onChange={(e) => setSelectedSupplierId(e.target.value)}
+                                                options={suppliers.map(s => ({ value: s.id, label: s.name }))}
+                                                placeholder="Select supplier"
+                                            />
+                                        </div>
+                                        <UniversalButton
+                                            color="blue"
+                                            variant="outlined"
+                                            icon={<HiUserAdd className="w-4 h-4" />}
+                                            iconOnly
+                                            onClick={() => setShowSupplierModal(true)}
+                                            title="Add New Supplier"
+                                        />
+                                    </div>
+
+                                    {/* Supplier Details Display */}
+                                    {selectedSupplier && (
+                                        <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 rounded p-2 space-y-1">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xs text-gray-600 dark:text-gray-400">Mobile:</span>
+                                                <span className="text-sm font-medium text-gray-800 dark:text-white">{selectedSupplier.mobile}</span>
+                                            </div>
+                                            {selectedSupplier.gstNumber && (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-gray-600 dark:text-gray-400">GST:</span>
+                                                    <span className="text-sm font-medium text-gray-800 dark:text-white">{selectedSupplier.gstNumber}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 border-t border-gray-200 dark:border-gray-700 pt-4">Summary</h2>
                             <div className="space-y-3">
                                 {/* Subtotal */}
                                 <div className="flex justify-between text-sm">
@@ -459,11 +537,9 @@ const PurchaseEdit = () => {
                                 </div>
 
                                 {/* Discount */}
-                                <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Discount
-                                    </label>
-                                    <div className="flex gap-2 mb-2">
+                                <div className="flex justify-between align-center text-sm">
+                                    <span className="text-gray-600 dark:text-gray-400">Discount</span>
+                                    <div className="flex gap-2">
                                         <select
                                             value={discountType}
                                             onChange={(e) => setDiscountType(e.target.value)}
@@ -477,15 +553,16 @@ const PurchaseEdit = () => {
                                             value={discountValue}
                                             onChange={(e) => setDiscountValue(e.target.value)}
                                             placeholder="0"
-                                            className="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                                            className="flex-1 px-2 py-1 w-24 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white no-spinner"
                                             min="0"
                                             step="0.01"
                                         />
                                     </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600 dark:text-gray-400">Discount Amount</span>
-                                        <span className="font-medium text-red-600 dark:text-red-400">-₹{discountAmount.toFixed(2)}</span>
-                                    </div>
+                                </div>
+
+                                <div className="flex justify-between text-sm">
+                                    <span className="text-gray-600 dark:text-gray-400">Discount Amount</span>
+                                    <span className="font-medium text-red-600 dark:text-red-400">-₹{discountAmount.toFixed(2)}</span>
                                 </div>
 
                                 {/* Tax Amount */}
@@ -556,10 +633,27 @@ const PurchaseEdit = () => {
                                 </div>
 
                                 {/* Action Buttons */}
-                                <div className="flex flex-col gap-2 pt-3">
+                                <div className="flex gap-2 pt-3">
+                                    <UniversalButton
+                                        color="red"
+                                        className="flex-1"
+                                        onClick={async () => {
+                                            const result = await SwalConfig.confirmCancel(
+                                                'Cancel Edit?',
+                                                'All unsaved changes will be lost.'
+                                            );
+
+                                            if (result.isConfirmed) {
+                                                navigate('/purchase');
+                                            }
+                                        }}
+                                        icon={<HiX className="w-4 h-4" />}
+                                    >
+                                        Cancel
+                                    </UniversalButton>
                                     <UniversalButton
                                         color="blue"
-                                        className="w-full"
+                                        className="flex-1"
                                         onClick={handleUpdate}
                                         icon={<HiSave className="w-4 h-4" />}
                                     >
@@ -567,19 +661,11 @@ const PurchaseEdit = () => {
                                     </UniversalButton>
                                     <UniversalButton
                                         color="green"
-                                        className="w-full"
+                                        className="flex-1"
                                         onClick={handleUpdateAndComplete}
                                         icon={<HiCheckCircle className="w-4 h-4" />}
                                     >
-                                        Update & Complete
-                                    </UniversalButton>
-                                    <UniversalButton
-                                        color="gray"
-                                        variant="outlined"
-                                        className="w-full"
-                                        onClick={() => navigate('/purchase')}
-                                    >
-                                        Cancel
+                                        Complete
                                     </UniversalButton>
                                 </div>
                             </div>

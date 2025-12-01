@@ -26,6 +26,9 @@ import PurchaseCreate from './pages/purchase/PurchaseCreate';
 import PurchaseEdit from './pages/purchase/PurchaseEdit';
 import IncomeIndex from './pages/income/IncomeIndex';
 import ExpensesIndex from './pages/expenses/ExpensesIndex';
+import SalaryIndex from './pages/salary/SalaryIndex';
+import SalaryCreate from './pages/salary/SalaryCreate';
+import SalaryEdit from './pages/salary/SalaryEdit';
 
 const Layout = () => {
   const location = useLocation();
@@ -57,6 +60,9 @@ const Layout = () => {
           <Route path="/purchase/edit/:id" element={<PurchaseEdit />} />
           <Route path="/income" element={<IncomeIndex />} />
           <Route path="/expenses" element={<ExpensesIndex />} />
+          <Route path="/salary" element={<SalaryIndex />} />
+          <Route path="/salary/create" element={<SalaryCreate />} />
+          <Route path="/salary/edit/:id" element={<SalaryEdit />} />
         </Routes>
       </div>
     </div>
