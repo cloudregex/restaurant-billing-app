@@ -238,41 +238,6 @@ const SalaryEdit = () => {
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
 
-                        {/* Employee & Basic Info Card */}
-                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Employee Information</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Select Employee <span className="text-red-500">*</span>
-                                    </label>
-                                    <UniversalSelect
-                                        value={selectedEmployeeId}
-                                        onChange={(e) => setSelectedEmployeeId(e.target.value)}
-                                        options={employees.map(e => ({ value: e.id, label: `${e.name} (${e.designation})` }))}
-                                        placeholder="Select an employee"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        Base Salary
-                                    </label>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span className="text-gray-500 sm:text-sm">₹</span>
-                                        </div>
-                                        <input
-                                            type="number"
-                                            value={baseSalary}
-                                            readOnly
-                                            className="w-full pl-7 px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         {/* Dynamic Tables */}
                         <DynamicTable
                             title="Deductions"
@@ -317,6 +282,37 @@ const SalaryEdit = () => {
                     {/* Sidebar */}
                     <div className="lg:col-span-1">
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 sticky top-6">
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">Employee Information</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="md:col-span-1">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Select Employee <span className="text-red-500">*</span>
+                                    </label>
+                                    <UniversalSelect
+                                        value={selectedEmployeeId}
+                                        onChange={(e) => setSelectedEmployeeId(e.target.value)}
+                                        options={employees.map(e => ({ value: e.id, label: `${e.name} (${e.designation})` }))}
+                                        placeholder="Select an employee"
+                                    />
+                                </div>
+
+                                <div className="md:col-span-1">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Base Salary
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span className="text-gray-500 sm:text-sm">₹</span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            value={baseSalary}
+                                            readOnly
+                                            className="w-full pl-7 px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                             <h2 className="text-xl font-semibold text-gray-800 dark:text-white my-4">Salary Details</h2>
 
                             <div className="space-y-4 mb-6">

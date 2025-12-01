@@ -26,11 +26,18 @@ const SalaryIndex = () => {
 
     // Dummy Data
     const [salaries, setSalaries] = useState([
-        { id: 1, employeeName: 'John Doe', designation: 'Manager', salaryDate: '2025-11-01', baseSalary: 50000, netSalary: 48000, status: 'Paid' },
-        { id: 2, employeeName: 'Jane Smith', designation: 'Chef', salaryDate: '2025-11-01', baseSalary: 35000, netSalary: 35000, status: 'Paid' },
-        { id: 3, employeeName: 'Mike Johnson', designation: 'Waiter', salaryDate: '2025-11-01', baseSalary: 15000, netSalary: 14500, status: 'Pending' },
-        { id: 4, employeeName: 'Sarah Williams', designation: 'Cashier', salaryDate: '2025-11-01', baseSalary: 18000, netSalary: 18000, status: 'Paid' },
-        { id: 5, employeeName: 'David Brown', designation: 'Cleaner', salaryDate: '2025-11-01', baseSalary: 12000, netSalary: 11000, status: 'Pending' },
+        { id: 1, employeeName: 'John Doe', designation: 'Manager', salaryDate: '2025-12-01', baseSalary: 50000, netSalary: 48000, status: 'Paid' },
+        { id: 2, employeeName: 'Jane Smith', designation: 'Chef', salaryDate: '2025-12-01', baseSalary: 35000, netSalary: 35000, status: 'Paid' },
+        { id: 3, employeeName: 'Mike Johnson', designation: 'Waiter', salaryDate: '2025-12-01', baseSalary: 15000, netSalary: 14500, status: 'Pending' },
+        { id: 4, employeeName: 'Sarah Williams', designation: 'Cashier', salaryDate: '2025-12-01', baseSalary: 18000, netSalary: 18000, status: 'Paid' },
+        { id: 5, employeeName: 'David Brown', designation: 'Cleaner', salaryDate: '2025-12-01', baseSalary: 12000, netSalary: 11000, status: 'Pending' },
+        { id: 6, employeeName: 'Emily Davis', designation: 'Waitress', salaryDate: '2025-11-01', baseSalary: 16000, netSalary: 15500, status: 'Paid' },
+        { id: 7, employeeName: 'Michael Wilson', designation: 'Chef', salaryDate: '2025-11-01', baseSalary: 32000, netSalary: 32000, status: 'Paid' },
+        { id: 8, employeeName: 'Jessica Taylor', designation: 'Manager', salaryDate: '2025-10-01', baseSalary: 52000, netSalary: 50000, status: 'Paid' },
+        { id: 9, employeeName: 'Daniel Anderson', designation: 'Cleaner', salaryDate: '2025-10-01', baseSalary: 12500, netSalary: 12500, status: 'Paid' },
+        { id: 10, employeeName: 'Laura Thomas', designation: 'Cashier', salaryDate: '2025-10-01', baseSalary: 18500, netSalary: 18000, status: 'Paid' },
+        { id: 11, employeeName: 'Kevin Martinez', designation: 'Waiter', salaryDate: '2025-10-01', baseSalary: 15500, netSalary: 15000, status: 'Pending' },
+        { id: 12, employeeName: 'Amanda White', designation: 'Waitress', salaryDate: '2025-10-01', baseSalary: 16500, netSalary: 16500, status: 'Paid' },
     ]);
 
     // Stats
